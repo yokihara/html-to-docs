@@ -4,7 +4,7 @@ Chrome extension for copying AI-generated HTML reports into Confluence as editab
 
 The MVP is a free public release candidate with English and Korean UI. Pro conversion is represented as a locked upgrade path until licensing is implemented.
 
-Current local builds enable Pro conversion so richer Confluence-ready clipboard output can be tested before billing is connected. In Pro mode, the popup also exposes a secondary local Rovo MCP preview that an agent can use to call Atlassian tools directly.
+Current local builds enable Pro conversion so richer Confluence-ready clipboard output can be tested before billing is connected. Pro adds document polish such as an auto document map, stronger section treatment, table headers, and code block styling. The popup also exposes a secondary local Rovo MCP preview that an agent can use to call Atlassian tools directly.
 
 ## Workspace
 

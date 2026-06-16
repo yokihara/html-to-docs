@@ -321,6 +321,8 @@ Pro:
 
 - richer Confluence-ready clipboard conversion
 - service-specific rendering rules
+- auto document map for multi-section reports
+- stronger section heading, table header, code block, callout, and card treatment
 - local Rovo MCP preview/action payload generation
 - guided Confluence create/update flow when MCP is available
 - richer document intent inspection

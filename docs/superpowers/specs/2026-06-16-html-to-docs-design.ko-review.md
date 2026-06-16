@@ -327,6 +327,8 @@ Pro:
 
 - 더 풍부한 Confluence-ready clipboard conversion
 - service-specific rendering rule
+- multi-section report용 자동 document map
+- section heading, table header, code block, callout, card 강화
 - local Rovo MCP preview/action payload generation
 - MCP가 있을 때 guided Confluence create/update flow
 - 더 풍부한 document intent inspection

@@ -127,6 +127,10 @@ export function convertHtmlToClipboardPayload(
 
   sanitizeNode(root, options.mode, warnings);
 
+  if (options.mode === "confluence-pro" && options.licenseStatus !== "free") {
+    enhanceProClipboardOutput(root);
+  }
+
   if (options.mode === "confluence-pro" && options.licenseStatus === "free") {
     warnings.push({
       code: "pro-locked",
@@ -231,6 +235,130 @@ function sanitizeNode(
   }
 }
 
+function enhanceProClipboardOutput(root: HTMLElement): void {
+  insertProDocumentMap(root);
+  polishProBlocks(root);
+}
+
+function insertProDocumentMap(root: HTMLElement): void {
+  const doc = root.ownerDocument;
+  const headings = Array.from(root.querySelectorAll("h1, h2, h3"))
+    .map((heading) => ({
+      level: Number(heading.tagName.slice(1)),
+      text: normalizeInlineText(heading.textContent ?? "")
+    }))
+    .filter((heading) => heading.text);
+
+  if (headings.length < 2) {
+    return;
+  }
+
+  const topLevelHeading = headings[0];
+  const sectionHeadings = headings
+    .filter((heading) => heading !== topLevelHeading)
+    .slice(0, 8);
+  const tableCount = root.querySelectorAll("table").length;
+  const calloutCount = root.querySelectorAll('[data-html-to-docs="callout"]').length;
+  const codeCount = root.querySelectorAll("pre").length;
+  const map = doc.createElement("div");
+  const listItems = sectionHeadings
+    .map((heading) => {
+      const indent = heading.level > 2 ? "&nbsp;&nbsp;" : "";
+      return `<li>${indent}${escapeGeneratedHtml(heading.text)}</li>`;
+    })
+    .join("");
+
+  map.setAttribute("data-html-to-docs", "pro-document-map");
+  map.setAttribute(
+    "style",
+    [
+      "border: 1px solid #85b8ff",
+      "border-left: 4px solid #0c66e4",
+      "border-radius: 6px",
+      "background-color: #f0f6ff",
+      "padding: 12px 14px",
+      "margin: 16px 0",
+      "color: #172b4d"
+    ].join("; ")
+  );
+  map.innerHTML = [
+    `<p style="margin: 0 0 6px; font-weight: 700">Document map</p>`,
+    `<p style="margin: 0 0 8px; color: #44546f">Sections ${sectionHeadings.length} · Tables ${tableCount} · Callouts ${calloutCount} · Code ${codeCount}</p>`,
+    `<ol style="margin: 0; padding-left: 20px">${listItems}</ol>`
+  ].join("");
+
+  const firstHeading = root.querySelector("h1, h2, h3");
+  if (firstHeading?.parentElement) {
+    firstHeading.insertAdjacentElement("afterend", map);
+  } else {
+    root.prepend(map);
+  }
+}
+
+function polishProBlocks(root: HTMLElement): void {
+  for (const heading of root.querySelectorAll<HTMLElement>("h2")) {
+    heading.setAttribute(
+      "style",
+      mergeInlineStyle(heading.getAttribute("style"), {
+        border: "0",
+        "border-left": "4px solid #0c66e4",
+        "background-color": "#f7f8f9",
+        padding: "8px 10px",
+        margin: "28px 0 12px",
+        color: "#0c1f3f"
+      })
+    );
+  }
+
+  for (const heading of root.querySelectorAll<HTMLElement>("h3")) {
+    heading.setAttribute(
+      "style",
+      mergeInlineStyle(heading.getAttribute("style"), {
+        color: "#172b4d",
+        "border-bottom": "1px solid #dfe1e6",
+        padding: "0 0 4px",
+        margin: "20px 0 8px"
+      })
+    );
+  }
+
+  for (const pre of root.querySelectorAll<HTMLElement>("pre")) {
+    pre.setAttribute(
+      "style",
+      mergeInlineStyle(pre.getAttribute("style"), {
+        border: "1px solid #dfe1e6",
+        "border-radius": "6px",
+        "background-color": "#f7f8f9",
+        padding: "12px",
+        color: "#172b4d"
+      })
+    );
+  }
+
+  for (const table of root.querySelectorAll<HTMLElement>("table")) {
+    table.setAttribute(
+      "style",
+      mergeInlineStyle(table.getAttribute("style"), {
+        border: "1px solid #dfe1e6",
+        "border-collapse": "collapse",
+        width: "100%",
+        margin: "14px 0"
+      })
+    );
+  }
+
+  for (const headerCell of root.querySelectorAll<HTMLElement>("th")) {
+    headerCell.setAttribute(
+      "style",
+      mergeInlineStyle(headerCell.getAttribute("style"), {
+        "background-color": "#e9f2ff",
+        color: "#0c1f3f",
+        "font-weight": "700"
+      })
+    );
+  }
+}
+
 function rewriteReportPattern(element: Element, mode: ConversionMode): void {
   const className = String(element.getAttribute("class") ?? "").toLowerCase();
   const classList = className.split(/\s+/).filter(Boolean);
@@ -294,6 +422,14 @@ function rewriteReportPattern(element: Element, mode: ConversionMode): void {
       );
     }
   }
+}
+
+function escapeGeneratedHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function sanitizeAttributes(

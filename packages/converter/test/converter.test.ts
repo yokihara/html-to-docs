@@ -93,6 +93,35 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.html).toContain("background-color: #ecfdf3");
     expect(result.html).toContain("트랙1 정리");
   });
+
+  it("adds Pro-only document polish that Basic output does not include", () => {
+    const source = `
+      <h1>BDS 2.0 — 로드맵</h1>
+      <h2>0. 이 문서의 위치</h2>
+      <p>전체 흐름을 설명합니다.</p>
+      <h2>1. 두 트랙 큰 그림</h2>
+      <table><tr><th>트랙</th><th>내용</th></tr><tr><td>1</td><td>정리</td></tr></table>
+      <h3>Phase 0</h3>
+      <pre><code>use_figma()</code></pre>
+    `;
+    const basic = convertHtmlToClipboardPayload(source, {
+      target: "confluence",
+      mode: "confluence-basic",
+      licenseStatus: "free"
+    });
+    const pro = convertHtmlToClipboardPayload(source, {
+      target: "confluence",
+      mode: "confluence-pro",
+      licenseStatus: "pro"
+    });
+
+    expect(basic.html).not.toContain("pro-document-map");
+    expect(pro.html).toContain("pro-document-map");
+    expect(pro.html).toContain("Document map");
+    expect(pro.html).toContain("Sections 3");
+    expect(pro.html).toContain("border-left: 4px solid #0c66e4");
+    expect(pro.html.length).toBeGreaterThan(basic.html.length);
+  });
 });
 
 describe("native document planning", () => {
