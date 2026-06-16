@@ -1,0 +1,67 @@
+{
+  "extensionName": {
+    "message": "html-to-docs",
+    "description": "Extension name."
+  },
+  "extensionDescription": {
+    "message": "Copy AI-generated HTML reports into Confluence as editable content.",
+    "description": "Chrome Web Store and manifest description."
+  },
+  "copyForConfluence": {
+    "message": "Copy for Confluence",
+    "description": "Primary popup action."
+  },
+  "openHtmlFile": {
+    "message": "Open HTML file",
+    "description": "Local file input label."
+  },
+  "currentTab": {
+    "message": "Current tab",
+    "description": "Current tab source label."
+  },
+  "localFile": {
+    "message": "Local file",
+    "description": "Local file source label."
+  },
+  "basicMode": {
+    "message": "Basic",
+    "description": "Free conversion mode label."
+  },
+  "proMode": {
+    "message": "Pro",
+    "description": "Pro conversion mode label."
+  },
+  "proLocked": {
+    "message": "Pro design preservation is locked in the free MVP.",
+    "description": "Locked Pro mode notice."
+  },
+  "copied": {
+    "message": "Copied. Paste into the Confluence editor.",
+    "description": "Successful copy status."
+  },
+  "copyFailed": {
+    "message": "Clipboard write failed.",
+    "description": "Clipboard failure status."
+  },
+  "tabReadFailed": {
+    "message": "This page cannot be read. Try opening a local HTML file.",
+    "description": "Current tab read failure."
+  },
+  "selectHtmlFile": {
+    "message": "Select an HTML file first.",
+    "description": "Missing local file warning."
+  },
+  "warningsLabel": {
+    "message": "Warnings",
+    "description": "Conversion warnings heading."
+  },
+  "sourceLabel": {
+    "message": "Source",
+    "description": "Source selector label."
+  },
+  "modeLabel": {
+    "message": "Mode",
+    "description": "Mode selector label."
+  }
+}
+

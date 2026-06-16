@@ -1,0 +1,16 @@
+{
+  "name": "@html-to-docs/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@html-to-docs/converter": "0.1.0",
+    "@html-to-docs/shared": "0.1.0"
+  },
+  "devDependencies": {}
+}
+

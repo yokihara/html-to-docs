@@ -1,0 +1,67 @@
+{
+  "extensionName": {
+    "message": "html-to-docs",
+    "description": "Extension name."
+  },
+  "extensionDescription": {
+    "message": "AI가 만든 HTML 보고서를 Confluence에 편집 가능한 콘텐츠로 복사합니다.",
+    "description": "Chrome Web Store and manifest description."
+  },
+  "copyForConfluence": {
+    "message": "Confluence용 복사",
+    "description": "Primary popup action."
+  },
+  "openHtmlFile": {
+    "message": "HTML 파일 열기",
+    "description": "Local file input label."
+  },
+  "currentTab": {
+    "message": "현재 탭",
+    "description": "Current tab source label."
+  },
+  "localFile": {
+    "message": "로컬 파일",
+    "description": "Local file source label."
+  },
+  "basicMode": {
+    "message": "Basic",
+    "description": "Free conversion mode label."
+  },
+  "proMode": {
+    "message": "Pro",
+    "description": "Pro conversion mode label."
+  },
+  "proLocked": {
+    "message": "무료 MVP에서는 Pro 디자인 보존 기능이 잠겨 있습니다.",
+    "description": "Locked Pro mode notice."
+  },
+  "copied": {
+    "message": "복사했습니다. Confluence 편집기에 붙여넣으세요.",
+    "description": "Successful copy status."
+  },
+  "copyFailed": {
+    "message": "클립보드 쓰기에 실패했습니다.",
+    "description": "Clipboard failure status."
+  },
+  "tabReadFailed": {
+    "message": "이 페이지를 읽을 수 없습니다. 로컬 HTML 파일을 열어보세요.",
+    "description": "Current tab read failure."
+  },
+  "selectHtmlFile": {
+    "message": "먼저 HTML 파일을 선택하세요.",
+    "description": "Missing local file warning."
+  },
+  "warningsLabel": {
+    "message": "주의",
+    "description": "Conversion warnings heading."
+  },
+  "sourceLabel": {
+    "message": "입력",
+    "description": "Source selector label."
+  },
+  "modeLabel": {
+    "message": "모드",
+    "description": "Mode selector label."
+  }
+}
+
