@@ -1,9 +1,5 @@
-import {
-  convertHtmlToClipboardPayload,
-  createConfluenceNativeDocPlan,
-  extractDocumentIntent
-} from "@html-to-docs/converter";
-import type { ClipboardPayload, ConversionMode, NativeDocPlan } from "@html-to-docs/shared";
+import { convertHtmlToClipboardPayload } from "@html-to-docs/converter";
+import type { ClipboardPayload } from "@html-to-docs/shared";
 import "./styles.css";
 
 type SourceMode = "tab" | "file";
@@ -47,16 +43,12 @@ const SNAPSHOT_STYLE_PROPERTIES = [
 
 const state: {
   sourceMode: SourceMode;
-  conversionMode: ConversionMode;
   fileHtml: string | null;
   fileName: string | null;
-  nativeDocPlan: NativeDocPlan | null;
 } = {
   sourceMode: "tab",
-  conversionMode: "confluence-basic",
   fileHtml: null,
-  fileName: null,
-  nativeDocPlan: null
+  fileName: null
 };
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -72,12 +64,16 @@ render();
 function render(status = "", warnings: string[] = []): void {
   root.innerHTML = `
     <section class="shell">
-      <header>
-        <h1>html-to-docs</h1>
-        <p>${i18n("extensionDescription")}</p>
+      <header class="masthead">
+        <div>
+          <span class="eyebrow">${i18n("freeBadge")}</span>
+          <h1>html-to-docs</h1>
+        </div>
+        <span class="target-pill">${i18n("targetConfluence")}</span>
       </header>
+      <p class="intro">${i18n("extensionDescription")}</p>
 
-      <section class="field">
+      <section class="panel">
         <span class="label">${i18n("sourceLabel")}</span>
         <div class="segmented" role="group" aria-label="${i18n("sourceLabel")}">
           <button data-source="tab" class="${state.sourceMode === "tab" ? "active" : ""}">
@@ -87,37 +83,26 @@ function render(status = "", warnings: string[] = []): void {
             ${i18n("localFile")}
           </button>
         </div>
-      </section>
 
-      <label class="file ${state.sourceMode === "file" ? "" : "hidden"}">
-        <span>${i18n("openHtmlFile")}</span>
-        <input id="html-file" type="file" accept=".html,text/html" />
-        <small>${state.fileName ?? ""}</small>
-      </label>
-
-      <section class="field">
-        <span class="label">${i18n("modeLabel")}</span>
-        <div class="segmented" role="group" aria-label="${i18n("modeLabel")}">
-          <button data-mode="confluence-basic" class="${state.conversionMode === "confluence-basic" ? "active" : ""}">
-            ${i18n("basicMode")}
-          </button>
-          <button data-mode="confluence-pro" class="${state.conversionMode === "confluence-pro" ? "active" : ""}">
-            ${i18n("proMode")}
-          </button>
-        </div>
-        ${state.conversionMode === "confluence-pro" ? `<p class="notice">${i18n("proPreview")}</p>` : ""}
+        <label class="file ${state.sourceMode === "file" ? "" : "hidden"}">
+          <span>${i18n("openHtmlFile")}</span>
+          <input id="html-file" type="file" accept=".html,text/html" />
+          <small>${state.fileName ?? i18n("noFileSelected")}</small>
+        </label>
       </section>
 
       <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
-      ${
-        state.conversionMode === "confluence-pro"
-          ? `<button id="mcp-preview" class="secondary">${i18n("previewNativeDocPlan")}</button>`
-          : ""
-      }
 
       <p id="status" class="status">${status}</p>
       ${warnings.length > 0 ? renderWarnings(warnings) : ""}
-      ${state.nativeDocPlan ? renderNativeDocPlan(state.nativeDocPlan) : ""}
+
+      <section class="beta">
+        <div>
+          <span class="label">${i18n("publishBetaTitle")}</span>
+          <p>${i18n("publishBetaDescription")}</p>
+        </div>
+        <button id="join-beta" class="secondary">${i18n("joinBeta")}</button>
+      </section>
     </section>
   `;
 
@@ -133,68 +118,10 @@ function renderWarnings(warnings: string[]): string {
   `;
 }
 
-function renderNativeDocPlan(plan: NativeDocPlan): string {
-  return `
-    <section class="native-plan">
-      <div>
-        <span class="label">${i18n("nativeDocPlanLabel")}</span>
-        <h2>${escapeHtml(plan.title)}</h2>
-        <p>${escapeHtml(plan.summary)}</p>
-      </div>
-
-      ${
-        plan.outline.length > 0
-          ? `
-            <section class="preview-group">
-              <h3>${i18n("outlineLabel")}</h3>
-              <ol>${plan.outline.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
-            </section>
-          `
-          : ""
-      }
-
-      <section class="preview-group">
-        <h3>${i18n("operationsLabel")}</h3>
-        <ul>
-          ${plan.operations
-            .map(
-              (operation) => `
-                <li>
-                  <strong>${escapeHtml(operation.label)}</strong>
-                  <span>${escapeHtml(operation.description)}</span>
-                </li>
-              `
-            )
-            .join("")}
-        </ul>
-      </section>
-
-      <section class="preview-group">
-        <h3>${i18n("nativePageBodyLabel")}</h3>
-        <pre>${escapeHtml(plan.bodyMarkdown)}</pre>
-      </section>
-
-      <section class="preview-group">
-        <h3>${i18n("executionPayloadLabel")}</h3>
-        <pre>${escapeHtml(JSON.stringify(plan.executionPayload, null, 2))}</pre>
-      </section>
-    </section>
-  `;
-}
-
 function bindEvents(): void {
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-source]")) {
     button.addEventListener("click", () => {
       state.sourceMode = button.dataset.source as SourceMode;
-      state.nativeDocPlan = null;
-      render();
-    });
-  }
-
-  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-mode]")) {
-    button.addEventListener("click", () => {
-      state.conversionMode = button.dataset.mode as ConversionMode;
-      state.nativeDocPlan = null;
       render();
     });
   }
@@ -212,12 +139,11 @@ function bindEvents(): void {
 
     state.fileName = file.name;
     state.fileHtml = await file.text();
-    state.nativeDocPlan = null;
     render();
   });
 
   root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyForConfluence);
-  root.querySelector<HTMLButtonElement>("#mcp-preview")?.addEventListener("click", previewNativeDocPlan);
+  root.querySelector<HTMLButtonElement>("#join-beta")?.addEventListener("click", copyPublishBetaInterest);
 }
 
 async function copyForConfluence(): Promise<void> {
@@ -230,12 +156,11 @@ async function copyForConfluence(): Promise<void> {
 
   const payload = convertHtmlToClipboardPayload(html, {
     target: "confluence",
-    mode: state.conversionMode,
-    licenseStatus: state.conversionMode === "confluence-pro" ? "pro" : "free"
+    mode: "confluence-basic",
+    licenseStatus: "free"
   });
 
   try {
-    state.nativeDocPlan = null;
     await writeClipboardPayload(payload);
     render(
       i18n("copied"),
@@ -246,17 +171,13 @@ async function copyForConfluence(): Promise<void> {
   }
 }
 
-async function previewNativeDocPlan(): Promise<void> {
-  const html = await getSourceHtmlForConversion();
-
-  if (!html) {
-    render(state.sourceMode === "file" ? i18n("selectHtmlFile") : i18n("tabReadFailed"));
-    return;
+async function copyPublishBetaInterest(): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(i18n("betaInterestText"));
+    render(i18n("betaCopied"));
+  } catch {
+    render(i18n("copyFailed"));
   }
-
-  const intent = extractDocumentIntent(html);
-  state.nativeDocPlan = createConfluenceNativeDocPlan(intent);
-  render(i18n("nativeDocPlanReady"), intent.warnings.map((warning) => warning.message));
 }
 
 async function getSourceHtmlForConversion(): Promise<string | null> {

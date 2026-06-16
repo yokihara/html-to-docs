@@ -7,6 +7,14 @@
     "message": "Copy AI-generated HTML reports into Confluence as editable content.",
     "description": "Chrome Web Store and manifest description."
   },
+  "freeBadge": {
+    "message": "Free utility",
+    "description": "Small product badge in the popup header."
+  },
+  "targetConfluence": {
+    "message": "Confluence",
+    "description": "Current target platform badge."
+  },
   "copyForConfluence": {
     "message": "Copy for Confluence",
     "description": "Primary popup action."
@@ -23,17 +31,9 @@
     "message": "Local file",
     "description": "Local file source label."
   },
-  "basicMode": {
-    "message": "Basic",
-    "description": "Free conversion mode label."
-  },
-  "proMode": {
-    "message": "Pro",
-    "description": "Pro conversion mode label."
-  },
-  "proPreview": {
-    "message": "Pro preview is enabled locally. Billing is not connected yet.",
-    "description": "Local Pro preview mode notice."
+  "noFileSelected": {
+    "message": "No file selected",
+    "description": "Empty local file state."
   },
   "copied": {
     "message": "Copied. Paste into the Confluence editor.",
@@ -59,36 +59,24 @@
     "message": "Source",
     "description": "Source selector label."
   },
-  "modeLabel": {
-    "message": "Mode",
-    "description": "Mode selector label."
+  "publishBetaTitle": {
+    "message": "Publish beta",
+    "description": "Paid beta CTA title."
   },
-  "previewNativeDocPlan": {
-    "message": "Preview Local Rovo MCP",
-    "description": "Primary action for local Pro preview."
+  "publishBetaDescription": {
+    "message": "Agent-assisted direct publishing is next.",
+    "description": "Paid beta CTA description."
   },
-  "nativeDocPlanReady": {
-    "message": "Created the local Rovo MCP execution payload.",
-    "description": "Status after creating the native document preview."
+  "joinBeta": {
+    "message": "Join beta",
+    "description": "Paid beta CTA button."
   },
-  "nativeDocPlanLabel": {
-    "message": "Rovo MCP local preview",
-    "description": "Native document plan section label."
+  "betaInterestText": {
+    "message": "I am interested in the html-to-docs Publish Beta: agent-assisted direct publishing to Confluence, Notion, and Obsidian.",
+    "description": "Text copied when the beta CTA is clicked."
   },
-  "outlineLabel": {
-    "message": "Outline",
-    "description": "Outline preview heading."
-  },
-  "operationsLabel": {
-    "message": "Confluence operation plan",
-    "description": "Native operation preview heading."
-  },
-  "nativePageBodyLabel": {
-    "message": "Confluence body",
-    "description": "Native Confluence markdown body preview heading."
-  },
-  "executionPayloadLabel": {
-    "message": "MCP execution payload",
-    "description": "MCP execution payload preview heading."
+  "betaCopied": {
+    "message": "Beta note copied.",
+    "description": "Status after copying beta interest text."
   }
 }

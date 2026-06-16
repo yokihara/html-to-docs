@@ -17,7 +17,7 @@ tags:
 
 The product should keep the original click-first promise: provide output that is immediately useful for the selected documentation service. For Confluence, the main extension action should still create a paste-ready clipboard payload. Testing showed that raw HTML/CSS fidelity is limited, so the product should improve service-aware rendering rather than expose internal planning as the main workflow.
 
-Atlassian Rovo MCP support remains valuable, but it should be an advanced/local execution path. When available, an agent can use the extracted intent and execution payload to create or update Confluence directly. That path should sit behind a secondary action, not replace the one-click copy flow.
+Atlassian Rovo MCP support remains valuable, but it should move out of the first free extension surface. When available, an agent can use the extracted intent and execution payload to create or update Confluence directly. That path should become part of a later Publish Beta or team pilot, not a confusing Pro toggle inside the MVP popup.
 
 The first target is still Confluence because the user pain is clearest there. Notion and Obsidian should remain first-class future targets through the same document intent model, not through Confluence-specific paste rules.
 
@@ -31,8 +31,8 @@ The revised first version should solve this user moment:
 2. The report looks good in a browser, but paste fidelity into Confluence is poor.
 3. The user wants the final result to become an editable Confluence page or section without manually rebuilding headings, tables, callouts, status badges, and code blocks.
 4. The tool produces a Confluence-ready clipboard payload that preserves as much editable structure and service-friendly styling as practical.
-5. In Pro mode, the renderer can apply richer target-specific normalization and preservation rules.
-6. If Rovo MCP is available in the local agent environment, a secondary action can prepare or drive a Confluence-native create/update workflow.
+5. The free MVP exposes only the best available Confluence copy action, with no Basic/Pro selector.
+6. If Rovo MCP is available in the local agent environment, a later paid beta can prepare or drive a Confluence-native create/update workflow outside the core popup.
 
 The product is not a pixel-perfect page importer. It is a bridge from agent output to service-ready documentation output. MCP execution is a powerful extension of the workflow, but the Chrome extension's main value should remain one-click service output.
 
@@ -41,11 +41,11 @@ The product is not a pixel-perfect page importer. It is a bridge from agent outp
 - Provide a Chrome extension MVP with current-tab and local `.html` file inputs.
 - Generate a Confluence-ready clipboard payload from agent-generated HTML reports.
 - Extract a platform-neutral document intent model as the internal engine for target renderers.
-- Keep `Copy Clean` as the free path for readable clipboard paste.
-- Use Pro for richer target-specific rendering and optional local Rovo MCP execution.
+- Keep `Copy for Confluence` as the free public path for readable clipboard paste.
+- Remove the current Pro button from the MVP popup because testing did not show enough visible value over the free output.
 - Preserve document editability for headings, paragraphs, lists, tables, code blocks, links, images, callouts, and status-like labels.
 - Establish a renderer architecture that can later support Notion, Obsidian, and other documentation tools.
-- Separate Free and Pro around target rendering quality and optional workflow capability.
+- Validate paid demand through a Publish Beta or team pilot instead of a monthly subscription paywall inside the first extension release.
 - Provide English and Korean extension UI from the MVP.
 
 ## Non-Goals
@@ -55,7 +55,7 @@ The product is not a pixel-perfect page importer. It is a bridge from agent outp
 - Do not require Confluence authentication for the free fallback path.
 - Do not use image capture as the primary output path.
 - Do not build history, batch export, team presets, or agent folder watching in the MVP.
-- Do not implement a production payment system in the MVP, though the license boundary should exist.
+- Do not implement a production payment system or in-popup Pro paywall in the MVP.
 
 ## Repository Shape
 
@@ -88,11 +88,10 @@ Responsibilities:
 - Let users choose a local `.html` file.
 - Let users choose the target, initially Confluence.
 - Call the converter package to extract a document intent model.
-- Offer `Copy Clean` for conservative clipboard output.
-- Offer Pro Confluence output for richer service-ready clipboard conversion.
-- Offer local Rovo MCP preview/execution as a secondary advanced action.
+- Offer `Copy for Confluence` for conservative clipboard output.
+- Offer a lightweight Publish Beta CTA for future agent-assisted direct publishing.
 - Show concise success and failure states.
-- Surface Pro/MCP workflow as a locked, preview, or mock-gated capability until licensing is implemented.
+- Keep Pro/MCP workflow experiments outside the main MVP UI until there is a paid beta or team pilot.
 - Localize all user-facing extension UI strings in English and Korean.
 
 The extension should avoid becoming the document intelligence layer. It owns browser permissions, source collection, clipboard UX, and handoff UX. Extraction and target rendering rules belong in `packages/converter`.
@@ -217,9 +216,9 @@ Confluence `Copy Clean` renderer:
 - conservative tables, headings, lists, code blocks, and callouts
 - no promise of visual fidelity
 
-Confluence local Rovo MCP renderer:
+Future Publish workflow renderer:
 
-- execution payload for an agent with Atlassian MCP access
+- execution payload for an agent with Atlassian MCP or equivalent connector access
 - target page title, parent/page selection hints, and structured blocks
 - explicit mapping from callout/status/table/code intent to Confluence-native capabilities
 - update/create safety checklist before writing
@@ -245,20 +244,20 @@ It should:
 
 Free mode is the value demonstration. It should reduce manual cleanup, but it should not be marketed as high-fidelity design preservation.
 
-### Pro / Native Doc Mode
+### Paid Beta / Native Publish Workflow
 
-Pro should keep the main click path simple: generate the best service-ready output available for the target. Native/Rovo MCP behavior is an advanced extension for users running an agent environment that can call Atlassian tools directly.
+Paid workflow work should not appear as a Pro toggle in the MVP popup. It should be validated through a Publish Beta or team pilot for users running an agent environment that can call Atlassian, Notion, or Obsidian-related tools directly.
 
 It should:
 
-- generate richer Confluence-ready clipboard output than Free mode
-- rebuild the source from document intent into clean service-ready HTML instead of decorating the original DOM
+- publish directly to the target service after review
+- rebuild the source from document intent into clean target-native content instead of decorating the original DOM
 - preserve callout/status/table/code intent through target-aware HTML and markdown rules where possible
-- expose a secondary local Rovo MCP preview/action path when available
-- prepare an Atlassian MCP action payload for direct tool execution outside the normal copy flow
-- optionally create or update a Confluence page when the user has MCP connected and confirms the action
+- prepare an Atlassian MCP or connector action payload for direct tool execution outside the normal copy flow
+- create or update a Confluence page when the user has the connector connected and confirms the action
+- support team presets, page placement, and update safety
 
-Pro should be marketed as better service-ready conversion first. `Native Doc Mode` or `Agent-to-Docs Workflow` can be an advanced feature, not the primary Chrome extension action.
+The paid promise should be workflow value first: fewer manual cleanup steps and safer direct publishing. `Native Doc Mode` or `Agent-to-Docs Workflow` can be an advanced feature, not the primary Chrome extension action.
 
 ## UX
 
@@ -266,7 +265,6 @@ The popup should be task-oriented rather than dashboard-like.
 
 Primary actions:
 
-- `Copy Clean`
 - `Copy for Confluence`
 - `Open HTML file`
 
@@ -274,18 +272,12 @@ Secondary states:
 
 - current tab detected
 - local file selected
-- fallback/native mode indicator
-- local Rovo MCP preview/action, if available
-- upgrade link when Pro rendering or MCP workflow is locked
+- Publish Beta CTA
 - concise warnings after extraction or rendering
 
 Copy fallback success message:
 
 > Copied. Paste into the Confluence editor.
-
-Local Rovo MCP preview success message:
-
-> Local Rovo MCP payload prepared. Review before writing to Confluence.
 
 Failure messages should be actionable:
 
@@ -294,11 +286,8 @@ Failure messages should be actionable:
 - HTML is too large to convert.
 - Some unsupported elements were removed.
 - Clipboard write failed.
-- Atlassian MCP is not connected.
-- Target Confluence page could not be resolved.
-- Native document generation needs user review before write.
 
-The extension should not require users to understand the converter internals. The main path should feel like one button. The Rovo MCP path should feel like a local/agent-powered advanced action.
+The extension should not require users to understand the converter internals. The main path should feel like one button. The Publish Beta CTA should feel like a future workflow invitation, not a disabled feature.
 
 All visible extension UI should ship in English and Korean. The product can choose the browser locale automatically, with a later settings override if needed.
 
@@ -306,29 +295,28 @@ All visible extension UI should ship in English and Korean. The product can choo
 
 The MVP should be treated as the first publicly distributable free commercial version, not just an internal prototype. Users should be able to install it and use the Free feature set without payment.
 
-The MVP may show Pro rendering and Rovo MCP execution as preview upgrade paths, but it should not depend on production billing. Real checkout, account management, and license enforcement belong to the later licensing phase. Until then, Pro can be represented through disabled controls, a waitlist/upgrade link, or a mock license flag for development.
+The MVP should not show a Basic/Pro selector. The tested Pro clipboard output was not visibly differentiated enough to justify a paywall, so the public extension should be free and focused on a polished `Copy for Confluence` workflow.
 
-The first paywall should be richer target-specific conversion. Rovo MCP execution can become an upper-plan workflow feature once the direct service output is good enough.
+The first paid validation should be a Publish Beta or team pilot, not a monthly subscription button in the extension. The paid promise should move beyond paste fidelity into agent-assisted direct publishing, workspace-aware document creation, target adapters, and team workflow guarantees.
 
 Free:
 
-- Copy Clean fallback
+- Copy for Confluence
 - current tab input
 - local HTML input
 - local document intent extraction
 - conservative semantic clipboard conversion
+- English and Korean popup UI
 
-Pro:
+Paid beta / team pilot:
 
-- richer Confluence-ready clipboard conversion
-- service-specific rendering rules
-- intent-based clean HTML regeneration
-- auto document map for multi-section reports
-- stronger section heading, table header, code block, callout, and card treatment
-- local Rovo MCP preview/action payload generation
-- guided Confluence create/update flow when MCP is available
-- richer document intent inspection
-- warnings that explain ambiguous blocks and target limitations
+- agent-assisted direct publish to Confluence, then Notion and Obsidian
+- local Rovo MCP or equivalent connector execution when available
+- review-before-write flow for create/update operations
+- target/page hints, parent placement, and update safety
+- team presets and preferred documentation patterns
+- higher-quality target adapters informed by real paid pilot fixtures
+- workflow support that saves manual cleanup time, not just a prettier clipboard payload
 
 Future higher tiers:
 
@@ -351,8 +339,8 @@ Converter tests:
 
 - fixture HTML input
 - document intent model snapshots
-- Copy Clean output snapshots
-- Pro service-ready clipboard snapshots
+- free Confluence clipboard output snapshots
+- experimental renderer snapshots only when they support paid beta work
 - Confluence native body/action snapshots
 - text fallback snapshots
 - warning/error snapshots
@@ -363,19 +351,17 @@ Extension tests:
 - current tab extraction
 - local file reading
 - clipboard payload creation
-- local Rovo MCP preview UI
-- MCP connection unavailable state
 - permission failures
 - large input failure
-- mode selection
+- source selection
+- Publish Beta CTA behavior
 
 Manual/semiautomated QA:
 
 - maintain a set of representative agent report fixtures
-- compare source HTML, extracted document intent, Copy Clean output, Pro clipboard output, and local Rovo MCP plan
-- for Copy Clean, paste each fixture into a Confluence test page and record limitations
-- for Pro, paste each fixture into a Confluence test page and record whether the service-ready output is meaningfully better
-- for Rovo MCP, create/update a test Confluence page through MCP or a mocked MCP payload and review the resulting structure
+- compare source HTML, extracted document intent, and free Confluence clipboard output
+- paste each fixture into a Confluence test page and record limitations
+- for paid beta experiments, create/update a test Confluence page through MCP or a mocked execution payload and review the resulting structure
 - feed findings back into extraction and target renderer rules
 
 The first QA checklist should verify:
@@ -386,8 +372,7 @@ The first QA checklist should verify:
 - readable code blocks
 - recognizable callouts/cards/status labels
 - acceptable plain-text fallback
-- local Rovo MCP outline matches source intent
-- target write operation is reviewed before execution
+- target write operation is reviewed before execution in paid beta experiments
 
 ## Roadmap
 
@@ -398,22 +383,24 @@ The first QA checklist should verify:
 - create converter package shell
 - support current tab HTML extraction
 - support local `.html` input
-- implement Copy Clean and Pro preview experiments
+- implement Copy for Confluence
 - write clipboard payloads
 - add initial converter fixtures
+- polish the free popup UI and add a Publish Beta CTA
 
 ### Phase 2: Document Intent Refactor
 
 - introduce document intent model types
 - refactor converter into extraction plus target renderers
 - create `copy-clean` renderer
-- create Pro Confluence clipboard renderer
-- create Confluence native body/action renderer
+- keep experimental Confluence renderers available for paid beta research
+- create Confluence native body/action renderer for agent workflow experiments
 - keep clipboard behavior as the primary extension path
 - add model snapshot tests
 
-### Phase 3: Local Rovo MCP Execution Path
+### Phase 3: Publish Beta / Agent Workflow
 
+- recruit paid beta or team pilot users
 - detect whether Atlassian MCP/Rovo workflow is available where possible
 - generate MCP-ready actions for Confluence create/update
 - add review-before-write UX
@@ -431,9 +418,9 @@ The first QA checklist should verify:
 ### Phase 5: Licensing
 
 - choose billing provider
-- add account/checkout flow
+- add account/checkout flow only after paid beta value is validated
 - add license API
-- unlock Pro rendering and optional Rovo MCP workflow
+- unlock Publish workflows, team presets, and optional connector execution
 - add extension settings for license status
 
 ### Phase 6: Additional Targets
@@ -470,8 +457,9 @@ This design was approved in conversation on 2026-06-16 with the following direct
 - prioritize Confluence
 - keep one-click service-ready output as the primary Chrome extension promise
 - use Free for Copy Clean and local intent extraction
-- use Pro for richer target-specific conversion
-- keep Rovo MCP/native workflow as an advanced local/agent-powered option
+- remove the Pro button from the MVP popup
+- keep Rovo MCP/native workflow outside the free popup as a later paid beta or team pilot
+- validate revenue with paid beta / team pilots before adding subscriptions
 - preserve multi-target future through a platform-neutral document intent model
 - keep the product in a separate `html-to-docs` project
 - include English and Korean as default extension UI languages

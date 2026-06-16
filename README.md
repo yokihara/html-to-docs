@@ -2,9 +2,9 @@
 
 Chrome extension for copying AI-generated HTML reports into Confluence as editable, service-ready content.
 
-The MVP is a free public release candidate with English and Korean UI. Pro conversion is represented as a locked upgrade path until licensing is implemented.
+The MVP is a free public release candidate with English and Korean UI. The popup now focuses on one action: `Copy for Confluence`.
 
-Current local builds enable Pro conversion so richer Confluence-ready clipboard output can be tested before billing is connected. Pro rebuilds the source from document intent into clean service-ready HTML, including an auto document map, stronger section treatment, table headers, and code block styling. The popup also exposes a secondary local Rovo MCP preview that an agent can use to call Atlassian tools directly.
+Paid validation should happen outside the free extension first, through a Publish Beta or team pilot for agent-assisted direct publishing to Confluence, Notion, and Obsidian. The extension keeps the user-facing surface free and simple while the converter package can continue to carry experimental renderers for later workflow testing.
 
 ## Workspace
 
