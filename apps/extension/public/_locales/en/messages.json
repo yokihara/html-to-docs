@@ -31,9 +31,9 @@
     "message": "Pro",
     "description": "Pro conversion mode label."
   },
-  "proLocked": {
-    "message": "Pro design preservation is locked in the free MVP.",
-    "description": "Locked Pro mode notice."
+  "proPreview": {
+    "message": "Pro preview is enabled locally. Billing is not connected yet.",
+    "description": "Local Pro preview mode notice."
   },
   "copied": {
     "message": "Copied. Paste into the Confluence editor.",
@@ -64,4 +64,3 @@
     "description": "Mode selector label."
   }
 }
-

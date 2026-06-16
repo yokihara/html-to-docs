@@ -35,6 +35,20 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.html).not.toContain("position: fixed");
   });
 
+  it("keeps safe styles in Basic mode but removes unsafe styles", () => {
+    const result = convertHtmlToClipboardPayload(
+      `<div style="color: red; position: fixed">Card</div>`,
+      {
+        target: "confluence",
+        mode: "confluence-basic",
+        licenseStatus: "free"
+      }
+    );
+
+    expect(result.html).toContain("color: red");
+    expect(result.html).not.toContain("position: fixed");
+  });
+
   it("falls Pro mode back to Basic when license is free", () => {
     const result = convertHtmlToClipboardPayload(`<div class="card" style="color: red">Card</div>`, {
       target: "confluence",
@@ -42,8 +56,7 @@ describe("convertHtmlToClipboardPayload", () => {
       licenseStatus: "free"
     });
 
-    expect(result.html).not.toContain("color: red");
+    expect(result.html).toContain("color: red");
     expect(result.warnings.map((warning) => warning.code)).toContain("pro-locked");
   });
 });
-

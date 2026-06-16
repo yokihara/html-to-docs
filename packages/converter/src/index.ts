@@ -31,19 +31,49 @@ const BLOCK_TAGS = new Set([
   "TR"
 ]);
 
-const PRO_STYLE_ALLOWLIST = new Set([
+const BASIC_STYLE_ALLOWLIST = new Set([
   "color",
   "background-color",
   "border",
+  "border-top",
+  "border-right",
+  "border-bottom",
+  "border-left",
+  "border-collapse",
   "border-radius",
+  "box-sizing",
+  "display",
+  "font-family",
+  "font-size",
   "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
   "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
   "font-weight",
   "font-style",
+  "line-height",
   "text-align",
+  "text-decoration",
+  "white-space",
   "width",
   "max-width",
+  "overflow",
   "vertical-align"
+]);
+
+const PRO_STYLE_ALLOWLIST = new Set([
+  ...BASIC_STYLE_ALLOWLIST,
+  "align-items",
+  "flex-wrap",
+  "gap",
+  "justify-content",
+  "letter-spacing"
 ]);
 
 export function convertHtmlToClipboardPayload(
@@ -177,16 +207,16 @@ function sanitizeAttributes(
     }
 
     if (name === "style") {
-      if (mode === "confluence-basic") {
+      const filteredStyle = filterInlineStyle(attribute.value, mode);
+      if (filteredStyle) {
+        element.setAttribute("style", filteredStyle);
+      } else {
         element.removeAttribute("style");
-        warnings.push({
+        pushWarningOnce(warnings, {
           code: "removed-style",
-          message: "Removed inline styles in Basic mode."
+          message: "Removed unsupported inline styles."
         });
-        continue;
       }
-
-      element.setAttribute("style", filterInlineStyle(attribute.value));
       continue;
     }
 
@@ -216,14 +246,16 @@ function sanitizeAttributes(
   }
 }
 
-function filterInlineStyle(style: string): string {
+function filterInlineStyle(style: string, mode: ConversionMode): string {
+  const allowlist = mode === "confluence-pro" ? PRO_STYLE_ALLOWLIST : BASIC_STYLE_ALLOWLIST;
+
   return style
     .split(";")
     .map((part) => part.trim())
     .filter(Boolean)
     .filter((part) => {
       const [property] = part.split(":");
-      return PRO_STYLE_ALLOWLIST.has(property.trim().toLowerCase());
+      return allowlist.has(property.trim().toLowerCase());
     })
     .join("; ");
 }
@@ -256,6 +288,14 @@ function isLayoutOnly(element: Element): boolean {
   return /grid|flex|layout|row|column|container/.test(className);
 }
 
+function pushWarningOnce(warnings: ConversionWarning[], warning: ConversionWarning): void {
+  if (warnings.some((item) => item.code === warning.code && item.message === warning.message)) {
+    return;
+  }
+
+  warnings.push(warning);
+}
+
 function normalizeWhitespace(html: string): string {
   return html.replace(/\n{3,}/g, "\n\n").trim();
 }
@@ -271,4 +311,3 @@ function normalizePlainText(text: string): string {
 export function shouldInsertLineBreak(tagName: string): boolean {
   return BLOCK_TAGS.has(tagName.toUpperCase());
 }
-

@@ -4,6 +4,8 @@ Chrome extension for copying AI-generated HTML reports into Confluence as editab
 
 The MVP is a free public release candidate with English and Korean UI. Pro conversion is represented as a locked upgrade path until licensing is implemented.
 
+Current local builds enable Pro preview so conversion quality can be tested before billing is connected.
+
 ## Workspace
 
 ```text
@@ -23,4 +25,3 @@ npm run build
 ```
 
 After `npm run build`, load `apps/extension/dist` as an unpacked extension in Chrome.
-

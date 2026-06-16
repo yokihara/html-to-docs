@@ -5,6 +5,46 @@ import "./styles.css";
 type SourceMode = "tab" | "file";
 
 const i18n = (key: string): string => chrome.i18n.getMessage(key) || key;
+const SNAPSHOT_STYLE_PROPERTIES = [
+  "color",
+  "background-color",
+  "border",
+  "border-top",
+  "border-right",
+  "border-bottom",
+  "border-left",
+  "border-collapse",
+  "border-radius",
+  "box-sizing",
+  "display",
+  "font-family",
+  "font-size",
+  "font-weight",
+  "font-style",
+  "line-height",
+  "text-align",
+  "text-decoration",
+  "white-space",
+  "width",
+  "max-width",
+  "vertical-align",
+  "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "overflow",
+  "align-items",
+  "flex-wrap",
+  "gap",
+  "justify-content",
+  "letter-spacing"
+] as const;
 
 const state: {
   sourceMode: SourceMode;
@@ -64,7 +104,7 @@ function render(status = "", warnings: string[] = []): void {
             ${i18n("proMode")}
           </button>
         </div>
-        ${state.conversionMode === "confluence-pro" ? `<p class="notice">${i18n("proLocked")}</p>` : ""}
+        ${state.conversionMode === "confluence-pro" ? `<p class="notice">${i18n("proPreview")}</p>` : ""}
       </section>
 
       <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
@@ -121,7 +161,7 @@ function bindEvents(): void {
 }
 
 async function copyForConfluence(): Promise<void> {
-  const html = state.sourceMode === "file" ? state.fileHtml : await captureCurrentTabHtml();
+  const html = await getSourceHtmlForConversion();
 
   if (!html) {
     render(state.sourceMode === "file" ? i18n("selectHtmlFile") : i18n("tabReadFailed"));
@@ -131,7 +171,7 @@ async function copyForConfluence(): Promise<void> {
   const payload = convertHtmlToClipboardPayload(html, {
     target: "confluence",
     mode: state.conversionMode,
-    licenseStatus: "free"
+    licenseStatus: state.conversionMode === "confluence-pro" ? "pro" : "free"
   });
 
   try {
@@ -145,6 +185,18 @@ async function copyForConfluence(): Promise<void> {
   }
 }
 
+async function getSourceHtmlForConversion(): Promise<string | null> {
+  if (state.sourceMode === "tab") {
+    return captureCurrentTabHtml();
+  }
+
+  if (!state.fileHtml) {
+    return null;
+  }
+
+  return snapshotHtmlFromString(state.fileHtml);
+}
+
 async function captureCurrentTabHtml(): Promise<string | null> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -155,13 +207,147 @@ async function captureCurrentTabHtml(): Promise<string | null> {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: () => document.documentElement.outerHTML
+      func: snapshotCurrentPageForHtmlToDocs
     });
 
     return typeof result?.result === "string" ? result.result : null;
   } catch {
     return null;
   }
+}
+
+async function snapshotHtmlFromString(html: string): Promise<string> {
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.left = "-9999px";
+  iframe.style.top = "0";
+  iframe.style.width = "960px";
+  iframe.style.height = "1200px";
+  iframe.style.opacity = "0";
+  iframe.srcdoc = stripScripts(html);
+
+  document.body.append(iframe);
+
+  await new Promise<void>((resolve) => {
+    iframe.addEventListener("load", () => resolve(), { once: true });
+  });
+
+  const snapshot = iframe.contentDocument
+    ? snapshotDocumentForPaste(iframe.contentDocument)
+    : html;
+  iframe.remove();
+
+  return snapshot;
+}
+
+function stripScripts(html: string): string {
+  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+}
+
+function snapshotDocumentForPaste(sourceDocument: Document): string {
+  const sourceBody = sourceDocument.body;
+  const clonedBody = sourceBody.cloneNode(true) as HTMLElement;
+  const sourceElements = [sourceBody, ...Array.from(sourceBody.querySelectorAll<HTMLElement>("*"))];
+  const clonedElements = [clonedBody, ...Array.from(clonedBody.querySelectorAll<HTMLElement>("*"))];
+
+  for (let index = 0; index < sourceElements.length; index += 1) {
+    inlineComputedStyle(sourceDocument.defaultView, sourceElements[index], clonedElements[index]);
+  }
+
+  return `<!doctype html><html><body>${clonedBody.innerHTML}</body></html>`;
+}
+
+function inlineComputedStyle(
+  view: Window | null,
+  sourceElement: HTMLElement | undefined,
+  clonedElement: HTMLElement | undefined
+): void {
+  if (!view || !sourceElement || !clonedElement) {
+    return;
+  }
+
+  const computedStyle = view.getComputedStyle(sourceElement);
+  const inlineStyle = SNAPSHOT_STYLE_PROPERTIES
+    .map((property) => {
+      const value = computedStyle.getPropertyValue(property);
+      return value ? `${property}: ${value}` : "";
+    })
+    .filter(Boolean)
+    .join("; ");
+
+  if (inlineStyle) {
+    clonedElement.setAttribute("style", inlineStyle);
+  }
+}
+
+function snapshotCurrentPageForHtmlToDocs(): string {
+  const styleProperties = [
+    "color",
+    "background-color",
+    "border",
+    "border-top",
+    "border-right",
+    "border-bottom",
+    "border-left",
+    "border-collapse",
+    "border-radius",
+    "box-sizing",
+    "display",
+    "font-family",
+    "font-size",
+    "font-weight",
+    "font-style",
+    "line-height",
+    "text-align",
+    "text-decoration",
+    "white-space",
+    "width",
+    "max-width",
+    "vertical-align",
+    "padding",
+    "padding-top",
+    "padding-right",
+    "padding-bottom",
+    "padding-left",
+    "margin",
+    "margin-top",
+    "margin-right",
+    "margin-bottom",
+    "margin-left",
+    "overflow",
+    "align-items",
+    "flex-wrap",
+    "gap",
+    "justify-content",
+    "letter-spacing"
+  ];
+  const sourceBody = document.body;
+  const clonedBody = sourceBody.cloneNode(true) as HTMLElement;
+  const sourceElements = [sourceBody, ...Array.from(sourceBody.querySelectorAll<HTMLElement>("*"))];
+  const clonedElements = [clonedBody, ...Array.from(clonedBody.querySelectorAll<HTMLElement>("*"))];
+
+  for (let index = 0; index < sourceElements.length; index += 1) {
+    const sourceElement = sourceElements[index];
+    const clonedElement = clonedElements[index];
+    if (!sourceElement || !clonedElement) {
+      continue;
+    }
+
+    const computedStyle = window.getComputedStyle(sourceElement);
+    const inlineStyle = styleProperties
+      .map((property) => {
+        const value = computedStyle.getPropertyValue(property);
+        return value ? `${property}: ${value}` : "";
+      })
+      .filter(Boolean)
+      .join("; ");
+
+    if (inlineStyle) {
+      clonedElement.setAttribute("style", inlineStyle);
+    }
+  }
+
+  return `<!doctype html><html><body>${clonedBody.innerHTML}</body></html>`;
 }
 
 async function writeClipboardPayload(payload: ClipboardPayload): Promise<void> {
