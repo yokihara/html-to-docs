@@ -252,6 +252,7 @@ Pro should keep the main click path simple: generate the best service-ready outp
 It should:
 
 - generate richer Confluence-ready clipboard output than Free mode
+- rebuild the source from document intent into clean service-ready HTML instead of decorating the original DOM
 - preserve callout/status/table/code intent through target-aware HTML and markdown rules where possible
 - expose a secondary local Rovo MCP preview/action path when available
 - prepare an Atlassian MCP action payload for direct tool execution outside the normal copy flow
@@ -321,6 +322,7 @@ Pro:
 
 - richer Confluence-ready clipboard conversion
 - service-specific rendering rules
+- intent-based clean HTML regeneration
 - auto document map for multi-section reports
 - stronger section heading, table header, code block, callout, and card treatment
 - local Rovo MCP preview/action payload generation

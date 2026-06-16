@@ -120,16 +120,21 @@ export function convertHtmlToClipboardPayload(
   sourceHtml: string,
   options: ConversionOptions
 ): ClipboardPayload {
+  if (options.mode === "confluence-pro" && options.licenseStatus !== "free") {
+    const intent = extractDocumentIntent(sourceHtml);
+    return {
+      html: renderProClipboardHtml(intent),
+      text: renderIntentPlainText(intent),
+      warnings: intent.warnings
+    };
+  }
+
   const warnings: ConversionWarning[] = [];
   const parser = new DOMParser();
   const document = parser.parseFromString(sourceHtml, "text/html");
   const root = document.body.cloneNode(true) as HTMLElement;
 
   sanitizeNode(root, options.mode, warnings);
-
-  if (options.mode === "confluence-pro" && options.licenseStatus !== "free") {
-    enhanceProClipboardOutput(root);
-  }
 
   if (options.mode === "confluence-pro" && options.licenseStatus === "free") {
     warnings.push({
@@ -232,130 +237,6 @@ function sanitizeNode(
 
     rewriteReportPattern(element, mode);
     sanitizeAttributes(element, mode, warnings);
-  }
-}
-
-function enhanceProClipboardOutput(root: HTMLElement): void {
-  insertProDocumentMap(root);
-  polishProBlocks(root);
-}
-
-function insertProDocumentMap(root: HTMLElement): void {
-  const doc = root.ownerDocument;
-  const headings = Array.from(root.querySelectorAll("h1, h2, h3"))
-    .map((heading) => ({
-      level: Number(heading.tagName.slice(1)),
-      text: normalizeInlineText(heading.textContent ?? "")
-    }))
-    .filter((heading) => heading.text);
-
-  if (headings.length < 2) {
-    return;
-  }
-
-  const topLevelHeading = headings[0];
-  const sectionHeadings = headings
-    .filter((heading) => heading !== topLevelHeading)
-    .slice(0, 8);
-  const tableCount = root.querySelectorAll("table").length;
-  const calloutCount = root.querySelectorAll('[data-html-to-docs="callout"]').length;
-  const codeCount = root.querySelectorAll("pre").length;
-  const map = doc.createElement("div");
-  const listItems = sectionHeadings
-    .map((heading) => {
-      const indent = heading.level > 2 ? "&nbsp;&nbsp;" : "";
-      return `<li>${indent}${escapeGeneratedHtml(heading.text)}</li>`;
-    })
-    .join("");
-
-  map.setAttribute("data-html-to-docs", "pro-document-map");
-  map.setAttribute(
-    "style",
-    [
-      "border: 1px solid #85b8ff",
-      "border-left: 4px solid #0c66e4",
-      "border-radius: 6px",
-      "background-color: #f0f6ff",
-      "padding: 12px 14px",
-      "margin: 16px 0",
-      "color: #172b4d"
-    ].join("; ")
-  );
-  map.innerHTML = [
-    `<p style="margin: 0 0 6px; font-weight: 700">Document map</p>`,
-    `<p style="margin: 0 0 8px; color: #44546f">Sections ${sectionHeadings.length} · Tables ${tableCount} · Callouts ${calloutCount} · Code ${codeCount}</p>`,
-    `<ol style="margin: 0; padding-left: 20px">${listItems}</ol>`
-  ].join("");
-
-  const firstHeading = root.querySelector("h1, h2, h3");
-  if (firstHeading?.parentElement) {
-    firstHeading.insertAdjacentElement("afterend", map);
-  } else {
-    root.prepend(map);
-  }
-}
-
-function polishProBlocks(root: HTMLElement): void {
-  for (const heading of root.querySelectorAll<HTMLElement>("h2")) {
-    heading.setAttribute(
-      "style",
-      mergeInlineStyle(heading.getAttribute("style"), {
-        border: "0",
-        "border-left": "4px solid #0c66e4",
-        "background-color": "#f7f8f9",
-        padding: "8px 10px",
-        margin: "28px 0 12px",
-        color: "#0c1f3f"
-      })
-    );
-  }
-
-  for (const heading of root.querySelectorAll<HTMLElement>("h3")) {
-    heading.setAttribute(
-      "style",
-      mergeInlineStyle(heading.getAttribute("style"), {
-        color: "#172b4d",
-        "border-bottom": "1px solid #dfe1e6",
-        padding: "0 0 4px",
-        margin: "20px 0 8px"
-      })
-    );
-  }
-
-  for (const pre of root.querySelectorAll<HTMLElement>("pre")) {
-    pre.setAttribute(
-      "style",
-      mergeInlineStyle(pre.getAttribute("style"), {
-        border: "1px solid #dfe1e6",
-        "border-radius": "6px",
-        "background-color": "#f7f8f9",
-        padding: "12px",
-        color: "#172b4d"
-      })
-    );
-  }
-
-  for (const table of root.querySelectorAll<HTMLElement>("table")) {
-    table.setAttribute(
-      "style",
-      mergeInlineStyle(table.getAttribute("style"), {
-        border: "1px solid #dfe1e6",
-        "border-collapse": "collapse",
-        width: "100%",
-        margin: "14px 0"
-      })
-    );
-  }
-
-  for (const headerCell of root.querySelectorAll<HTMLElement>("th")) {
-    headerCell.setAttribute(
-      "style",
-      mergeInlineStyle(headerCell.getAttribute("style"), {
-        "background-color": "#e9f2ff",
-        color: "#0c1f3f",
-        "font-weight": "700"
-      })
-    );
   }
 }
 
@@ -939,6 +820,247 @@ function createMcpExecutionPayload(title: string, body: string): NativeDocExecut
     body,
     requiredInputs: ["cloudId", "spaceId", "parentId or explicit create location"]
   };
+}
+
+function renderProClipboardHtml(intent: DocumentIntent): string {
+  const blocks = intent.blocks;
+  const body = [
+    renderProTitle(intent),
+    renderProDocumentMap(intent),
+    ...blocks.slice(blocks[0]?.type === "heading" ? 1 : 0).map(renderProBlockHtml)
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return normalizeWhitespace(`<section data-html-to-docs="pro-rendered">${body}</section>`);
+}
+
+function renderProTitle(intent: DocumentIntent): string {
+  return [
+    `<h1 style="${proStyle({
+      margin: "0 0 8px",
+      color: "#0c1f3f",
+      "font-size": "30px",
+      "line-height": "1.25",
+      "font-weight": "800"
+    })}">${escapeGeneratedHtml(intent.title)}</h1>`,
+    `<p style="${proStyle({
+      margin: "0 0 16px",
+      color: "#44546f",
+      "font-size": "13px"
+    })}">Converted with html-to-docs Pro · service-ready Confluence output</p>`
+  ].join("\n");
+}
+
+function renderProDocumentMap(intent: DocumentIntent): string {
+  const headings = intent.blocks
+    .filter((block) => block.type === "heading" && block.text)
+    .slice(1, 9);
+
+  if (headings.length === 0) {
+    return "";
+  }
+
+  const items = headings
+    .map((heading) => {
+      const prefix = heading.level && heading.level > 2 ? "&nbsp;&nbsp;" : "";
+      return `<li>${prefix}${escapeGeneratedHtml(heading.text ?? "")}</li>`;
+    })
+    .join("");
+
+  return [
+    `<div data-html-to-docs="pro-document-map" style="${proStyle({
+      border: "1px solid #85b8ff",
+      "border-left": "4px solid #0c66e4",
+      "border-radius": "6px",
+      "background-color": "#f0f6ff",
+      padding: "12px 14px",
+      margin: "16px 0",
+      color: "#172b4d"
+    })}">`,
+    `<p style="${proStyle({ margin: "0 0 6px", "font-weight": "700" })}">Document map</p>`,
+    `<p style="${proStyle({ margin: "0 0 8px", color: "#44546f" })}">Sections ${headings.length} · Tables ${intent.stats.tables} · Callouts ${intent.stats.callouts} · Code ${intent.stats.codeBlocks}</p>`,
+    `<ol style="${proStyle({ margin: "0", "padding-left": "20px" })}">${items}</ol>`,
+    `</div>`
+  ].join("");
+}
+
+function renderProBlockHtml(block: DocumentIntentBlock): string {
+  switch (block.type) {
+    case "heading":
+      return renderProHeading(block);
+    case "paragraph":
+      return renderProParagraph(block.text ?? "");
+    case "callout":
+      return renderProCallout(block);
+    case "list":
+      return renderProList(block);
+    case "table":
+      return renderProTable(block);
+    case "code":
+      return renderProCode(block);
+    case "divider":
+      return `<hr style="${proStyle({ border: "0", "border-top": "1px solid #dfe1e6", margin: "20px 0" })}">`;
+    default:
+      return "";
+  }
+}
+
+function renderProHeading(block: DocumentIntentBlock): string {
+  const level = Math.min(Math.max(block.level ?? 2, 2), 4);
+  const text = escapeGeneratedHtml(block.text ?? "");
+  const style =
+    level === 2
+      ? proStyle({
+          "border-left": "4px solid #0c66e4",
+          "background-color": "#f7f8f9",
+          padding: "8px 10px",
+          margin: "28px 0 12px",
+          color: "#0c1f3f",
+          "font-size": "22px",
+          "font-weight": "750"
+        })
+      : proStyle({
+          color: "#172b4d",
+          "border-bottom": "1px solid #dfe1e6",
+          padding: "0 0 4px",
+          margin: "20px 0 8px",
+          "font-size": level === 3 ? "18px" : "15px",
+          "font-weight": "700"
+        });
+
+  return `<h${level} style="${style}">${text}</h${level}>`;
+}
+
+function renderProParagraph(text: string): string {
+  return `<p style="${proStyle({
+    margin: "8px 0",
+    color: "#172b4d",
+    "line-height": "1.65"
+  })}">${escapeGeneratedHtml(text)}</p>`;
+}
+
+function renderProCallout(block: DocumentIntentBlock): string {
+  const toneStyles: Record<DocumentIntentTone, Record<string, string>> = {
+    info: { border: "#85b8ff", background: "#f0f6ff", label: "Info" },
+    success: { border: "#7ee2b8", background: "#e3fcef", label: "Success" },
+    warning: { border: "#f5cd47", background: "#fff7d6", label: "Warning" },
+    danger: { border: "#ffbdad", background: "#fff4f0", label: "Important" },
+    neutral: { border: "#b6c2cf", background: "#f7f8f9", label: "Note" }
+  };
+  const tone = toneStyles[block.tone ?? "neutral"];
+
+  return [
+    `<div data-html-to-docs="pro-callout" style="${proStyle({
+      border: `1px solid ${tone.border}`,
+      "border-left": `4px solid ${tone.border}`,
+      "border-radius": "6px",
+      "background-color": tone.background,
+      padding: "12px 14px",
+      margin: "14px 0",
+      color: "#172b4d"
+    })}">`,
+    `<p style="${proStyle({ margin: "0 0 4px", "font-weight": "700" })}">${tone.label}</p>`,
+    `<p style="${proStyle({ margin: "0", "line-height": "1.6" })}">${escapeGeneratedHtml(block.text ?? "")}</p>`,
+    `</div>`
+  ].join("");
+}
+
+function renderProList(block: DocumentIntentBlock): string {
+  const tag = block.ordered ? "ol" : "ul";
+  const items = (block.items ?? [])
+    .map((item) => `<li style="${proStyle({ margin: "4px 0" })}">${escapeGeneratedHtml(item)}</li>`)
+    .join("");
+  return `<${tag} style="${proStyle({ margin: "8px 0", "padding-left": "24px", "line-height": "1.6" })}">${items}</${tag}>`;
+}
+
+function renderProTable(block: DocumentIntentBlock): string {
+  const headers = block.headers ?? [];
+  const rows = block.rows ?? [];
+  const headerHtml =
+    headers.length > 0
+      ? `<tr>${headers
+          .map(
+            (header) =>
+              `<th style="${proStyle({
+                border: "1px solid #dfe1e6",
+                "background-color": "#e9f2ff",
+                color: "#0c1f3f",
+                padding: "8px 10px",
+                "font-weight": "700",
+                "text-align": "left"
+              })}">${escapeGeneratedHtml(header)}</th>`
+          )
+          .join("")}</tr>`
+      : "";
+  const rowHtml = rows
+    .map((row, rowIndex) => {
+      const background = rowIndex % 2 === 0 ? "#ffffff" : "#f7f8f9";
+      return `<tr>${row
+        .map(
+          (cell) =>
+            `<td style="${proStyle({
+              border: "1px solid #dfe1e6",
+              "background-color": background,
+              padding: "8px 10px",
+              "vertical-align": "top"
+            })}">${escapeGeneratedHtml(cell)}</td>`
+        )
+        .join("")}</tr>`;
+    })
+    .join("");
+
+  return `<table style="${proStyle({
+    width: "100%",
+    "border-collapse": "collapse",
+    margin: "14px 0",
+    "font-size": "14px"
+  })}">${headerHtml}${rowHtml}</table>`;
+}
+
+function renderProCode(block: DocumentIntentBlock): string {
+  return [
+    block.language
+      ? `<p style="${proStyle({ margin: "8px 0 4px", color: "#44546f", "font-size": "12px", "font-weight": "700" })}">${escapeGeneratedHtml(block.language)}</p>`
+      : "",
+    `<pre style="${proStyle({
+      border: "1px solid #dfe1e6",
+      "border-radius": "6px",
+      "background-color": "#f7f8f9",
+      padding: "12px",
+      margin: "10px 0",
+      color: "#172b4d",
+      "line-height": "1.55",
+      "white-space": "pre-wrap"
+    })}"><code>${escapeGeneratedHtml(block.text ?? "")}</code></pre>`
+  ]
+    .filter(Boolean)
+    .join("");
+}
+
+function renderIntentPlainText(intent: DocumentIntent): string {
+  return normalizePlainText(
+    intent.blocks
+      .map((block) => {
+        if (block.type === "heading") {
+          return `${"#".repeat(block.level ?? 1)} ${block.text ?? ""}`;
+        }
+        if (block.type === "list") {
+          return (block.items ?? []).join("\n");
+        }
+        if (block.type === "table") {
+          return [...(block.headers ?? []), ...(block.rows ?? []).flat()].join(" ");
+        }
+        return block.text ?? "";
+      })
+      .join("\n")
+  );
+}
+
+function proStyle(styles: Record<string, string>): string {
+  return Object.entries(styles)
+    .map(([property, value]) => `${property}: ${value}`)
+    .join("; ");
 }
 
 function normalizeWhitespace(html: string): string {

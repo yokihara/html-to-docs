@@ -23,9 +23,9 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.warnings.map((warning) => warning.code)).toContain("removed-script");
   });
 
-  it("keeps allowed Pro styles when Pro is unlocked", () => {
+  it("renders unlocked Pro as clean service-ready document HTML", () => {
     const result = convertHtmlToClipboardPayload(
-      `<div class="card" style="color: red; position: fixed"><span class="badge">Ready</span></div>`,
+      `<h1>Report</h1><div class="card" style="color: red; position: fixed"><span class="badge">Ready</span></div>`,
       {
         target: "confluence",
         mode: "confluence-pro",
@@ -33,9 +33,10 @@ describe("convertHtmlToClipboardPayload", () => {
       }
     );
 
-    expect(result.html).toContain("data-html-to-docs=\"card\"");
-    expect(result.html).toContain("color: red");
-    expect(result.html).toContain("border-radius");
+    expect(result.html).toContain("data-html-to-docs=\"pro-rendered\"");
+    expect(result.html).toContain("Report");
+    expect(result.html).toContain("Ready");
+    expect(result.html).toContain("service-ready Confluence output");
     expect(result.html).not.toContain("position: fixed");
   });
 
@@ -64,7 +65,7 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.warnings.map((warning) => warning.code)).toContain("pro-locked");
   });
 
-  it("normalizes dark pasted table styles to readable light styles", () => {
+  it("renders dark pasted tables as clean light Pro tables", () => {
     const result = convertHtmlToClipboardPayload(
       `<table><tr><td style="background-color: rgb(0, 0, 0); color: rgb(20, 20, 20)">Hidden</td></tr></table>`,
       {
@@ -74,18 +75,18 @@ describe("convertHtmlToClipboardPayload", () => {
       }
     );
 
-    expect(result.html).toContain("background-color: #f7f8f9");
-    expect(result.html).toContain("color: #172b4d");
+    expect(result.html).toContain("background-color: #ffffff");
+    expect(result.html).not.toContain("rgb(0, 0, 0)");
     expect(result.text).toContain("Hidden");
   });
 
-  it("rewrites compact report tags to visible Confluence-friendly badges", () => {
+  it("rewrites compact report tags to visible Confluence-friendly badges in Basic", () => {
     const result = convertHtmlToClipboardPayload(
       `<span class="t t1" style="color: rgb(255, 255, 255); background-color: rgb(22, 163, 74)">트랙1 정리</span>`,
       {
         target: "confluence",
-        mode: "confluence-pro",
-        licenseStatus: "pro"
+        mode: "confluence-basic",
+        licenseStatus: "free"
       }
     );
 
