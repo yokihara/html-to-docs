@@ -29,9 +29,62 @@ export interface ClipboardPayload {
   warnings: ConversionWarning[];
 }
 
+export type DocumentIntentBlockType =
+  | "heading"
+  | "paragraph"
+  | "list"
+  | "table"
+  | "code"
+  | "callout"
+  | "divider";
+
+export type DocumentIntentTone = "info" | "success" | "warning" | "danger" | "neutral";
+
+export interface DocumentIntentBlock {
+  id: string;
+  type: DocumentIntentBlockType;
+  text?: string;
+  level?: number;
+  tone?: DocumentIntentTone;
+  ordered?: boolean;
+  items?: string[];
+  headers?: string[];
+  rows?: string[][];
+  language?: string;
+}
+
+export interface DocumentIntent {
+  title: string;
+  blocks: DocumentIntentBlock[];
+  stats: {
+    headings: number;
+    callouts: number;
+    tables: number;
+    codeBlocks: number;
+    lists: number;
+  };
+  warnings: ConversionWarning[];
+}
+
+export interface NativeDocOperation {
+  id: string;
+  label: string;
+  description: string;
+  blockIds: string[];
+}
+
+export interface NativeDocPlan {
+  target: TargetPlatform;
+  title: string;
+  summary: string;
+  outline: string[];
+  operations: NativeDocOperation[];
+  prompt: string;
+  intent: DocumentIntent;
+}
+
 export interface TabHtmlResponse {
   html?: string;
   title?: string;
   error?: string;
 }
-

@@ -1,5 +1,9 @@
-import { convertHtmlToClipboardPayload } from "@html-to-docs/converter";
-import type { ClipboardPayload, ConversionMode } from "@html-to-docs/shared";
+import {
+  convertHtmlToClipboardPayload,
+  createConfluenceNativeDocPlan,
+  extractDocumentIntent
+} from "@html-to-docs/converter";
+import type { ClipboardPayload, ConversionMode, NativeDocPlan } from "@html-to-docs/shared";
 import "./styles.css";
 
 type SourceMode = "tab" | "file";
@@ -46,11 +50,13 @@ const state: {
   conversionMode: ConversionMode;
   fileHtml: string | null;
   fileName: string | null;
+  nativeDocPlan: NativeDocPlan | null;
 } = {
   sourceMode: "tab",
   conversionMode: "confluence-basic",
   fileHtml: null,
-  fileName: null
+  fileName: null,
+  nativeDocPlan: null
 };
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -102,10 +108,13 @@ function render(status = "", warnings: string[] = []): void {
         ${state.conversionMode === "confluence-pro" ? `<p class="notice">${i18n("proPreview")}</p>` : ""}
       </section>
 
-      <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
+      <button id="copy" class="primary">
+        ${state.conversionMode === "confluence-pro" ? i18n("previewNativeDocPlan") : i18n("copyForConfluence")}
+      </button>
 
       <p id="status" class="status">${status}</p>
       ${warnings.length > 0 ? renderWarnings(warnings) : ""}
+      ${state.nativeDocPlan ? renderNativeDocPlan(state.nativeDocPlan) : ""}
     </section>
   `;
 
@@ -121,10 +130,57 @@ function renderWarnings(warnings: string[]): string {
   `;
 }
 
+function renderNativeDocPlan(plan: NativeDocPlan): string {
+  return `
+    <section class="native-plan">
+      <div>
+        <span class="label">${i18n("nativeDocPlanLabel")}</span>
+        <h2>${escapeHtml(plan.title)}</h2>
+        <p>${escapeHtml(plan.summary)}</p>
+      </div>
+
+      ${
+        plan.outline.length > 0
+          ? `
+            <section class="preview-group">
+              <h3>${i18n("outlineLabel")}</h3>
+              <ol>${plan.outline.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
+            </section>
+          `
+          : ""
+      }
+
+      <section class="preview-group">
+        <h3>${i18n("operationsLabel")}</h3>
+        <ul>
+          ${plan.operations
+            .map(
+              (operation) => `
+                <li>
+                  <strong>${escapeHtml(operation.label)}</strong>
+                  <span>${escapeHtml(operation.description)}</span>
+                </li>
+              `
+            )
+            .join("")}
+        </ul>
+      </section>
+
+      <section class="preview-group">
+        <h3>${i18n("mcpPromptLabel")}</h3>
+        <pre>${escapeHtml(plan.prompt)}</pre>
+      </section>
+
+      <button id="copy-prompt" class="secondary">${i18n("copyMcpPrompt")}</button>
+    </section>
+  `;
+}
+
 function bindEvents(): void {
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-source]")) {
     button.addEventListener("click", () => {
       state.sourceMode = button.dataset.source as SourceMode;
+      state.nativeDocPlan = null;
       render();
     });
   }
@@ -132,6 +188,7 @@ function bindEvents(): void {
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-mode]")) {
     button.addEventListener("click", () => {
       state.conversionMode = button.dataset.mode as ConversionMode;
+      state.nativeDocPlan = null;
       render();
     });
   }
@@ -149,10 +206,12 @@ function bindEvents(): void {
 
     state.fileName = file.name;
     state.fileHtml = await file.text();
+    state.nativeDocPlan = null;
     render();
   });
 
   root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyForConfluence);
+  root.querySelector<HTMLButtonElement>("#copy-prompt")?.addEventListener("click", copyNativeDocPrompt);
 }
 
 async function copyForConfluence(): Promise<void> {
@@ -163,10 +222,17 @@ async function copyForConfluence(): Promise<void> {
     return;
   }
 
+  if (state.conversionMode === "confluence-pro") {
+    const intent = extractDocumentIntent(html);
+    state.nativeDocPlan = createConfluenceNativeDocPlan(intent);
+    render(i18n("nativeDocPlanReady"), intent.warnings.map((warning) => warning.message));
+    return;
+  }
+
   const payload = convertHtmlToClipboardPayload(html, {
     target: "confluence",
     mode: state.conversionMode,
-    licenseStatus: state.conversionMode === "confluence-pro" ? "pro" : "free"
+    licenseStatus: "free"
   });
 
   try {
@@ -175,6 +241,20 @@ async function copyForConfluence(): Promise<void> {
       i18n("copied"),
       payload.warnings.map((warning) => warning.message)
     );
+  } catch {
+    render(i18n("copyFailed"));
+  }
+}
+
+async function copyNativeDocPrompt(): Promise<void> {
+  if (!state.nativeDocPlan) {
+    render(i18n("nativeDocPlanMissing"));
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(state.nativeDocPlan.prompt);
+    render(i18n("mcpPromptCopied"));
   } catch {
     render(i18n("copyFailed"));
   }

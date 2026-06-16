@@ -62,5 +62,41 @@
   "modeLabel": {
     "message": "모드",
     "description": "Mode selector label."
+  },
+  "previewNativeDocPlan": {
+    "message": "Native Doc Plan 미리보기",
+    "description": "Primary action for local Pro preview."
+  },
+  "nativeDocPlanReady": {
+    "message": "Pro Native Doc Plan을 만들었습니다.",
+    "description": "Status after creating the native document preview."
+  },
+  "nativeDocPlanMissing": {
+    "message": "먼저 Native Doc Plan을 만드세요.",
+    "description": "Missing native plan status."
+  },
+  "nativeDocPlanLabel": {
+    "message": "Pro 로컬 미리보기",
+    "description": "Native document plan section label."
+  },
+  "outlineLabel": {
+    "message": "문서 구조",
+    "description": "Outline preview heading."
+  },
+  "operationsLabel": {
+    "message": "Confluence 작업 계획",
+    "description": "Native operation preview heading."
+  },
+  "mcpPromptLabel": {
+    "message": "MCP 프롬프트",
+    "description": "MCP prompt preview heading."
+  },
+  "copyMcpPrompt": {
+    "message": "MCP 프롬프트 복사",
+    "description": "Copy MCP prompt button."
+  },
+  "mcpPromptCopied": {
+    "message": "MCP 프롬프트를 복사했습니다.",
+    "description": "Successful MCP prompt copy status."
   }
 }

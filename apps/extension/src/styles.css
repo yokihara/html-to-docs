@@ -73,7 +73,8 @@ p {
 }
 
 .segmented button,
-.primary {
+.primary,
+.secondary {
   min-height: 36px;
   border: 0;
   border-radius: 6px;
@@ -130,6 +131,13 @@ p {
   font-weight: 700;
 }
 
+.secondary {
+  border: 1px solid #8590a2;
+  background: #ffffff;
+  color: #172b4d;
+  font-weight: 700;
+}
+
 .status {
   color: #216e4e;
 }
@@ -154,4 +162,59 @@ p {
   color: #533f04;
   font-size: 12px;
   line-height: 1.4;
+}
+
+.native-plan {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #b3d4ff;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.preview-group {
+  display: grid;
+  gap: 8px;
+}
+
+h3 {
+  margin: 0;
+  color: #172b4d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.native-plan ol,
+.native-plan ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.native-plan li {
+  color: #172b4d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.native-plan li span {
+  display: block;
+  color: #626f86;
+}
+
+.native-plan pre {
+  max-height: 180px;
+  margin: 0;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #dfe1e6;
+  border-radius: 6px;
+  background: #f7f8f9;
+  color: #172b4d;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
 }

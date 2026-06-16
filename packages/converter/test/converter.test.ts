@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { convertHtmlToClipboardPayload } from "../src";
+import {
+  convertHtmlToClipboardPayload,
+  createConfluenceNativeDocPlan,
+  extractDocumentIntent
+} from "../src";
 
 describe("convertHtmlToClipboardPayload", () => {
   it("removes scripts and unsafe event attributes", () => {
@@ -88,5 +92,47 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.html).toContain("color: #166534");
     expect(result.html).toContain("background-color: #ecfdf3");
     expect(result.html).toContain("트랙1 정리");
+  });
+});
+
+describe("native document planning", () => {
+  it("extracts document intent from agent-style HTML", () => {
+    const intent = extractDocumentIntent(`
+      <h1>BDS 2.0 — 로드맵</h1>
+      <div class="warning">백업 브랜치 필수</div>
+      <h2>두 트랙 큰 그림</h2>
+      <table>
+        <tr><th>비유</th><th>트랙1</th><th>트랙2</th></tr>
+        <tr><td>방</td><td>정리정돈</td><td>리모델링</td></tr>
+      </table>
+      <pre><code class="language-ts">const mode = "native";</code></pre>
+    `);
+
+    expect(intent.title).toBe("BDS 2.0 — 로드맵");
+    expect(intent.stats.headings).toBe(2);
+    expect(intent.stats.callouts).toBe(1);
+    expect(intent.stats.tables).toBe(1);
+    expect(intent.stats.codeBlocks).toBe(1);
+    expect(intent.blocks.some((block) => block.type === "callout" && block.tone === "warning")).toBe(
+      true
+    );
+  });
+
+  it("creates a Confluence-native operation plan and MCP prompt", () => {
+    const intent = extractDocumentIntent(`
+      <h1>Release Notes</h1>
+      <p>Ship the native doc workflow first.</p>
+      <ul><li>Extract intent</li><li>Create Confluence plan</li></ul>
+      <table><tr><th>Area</th><th>Status</th></tr><tr><td>MVP</td><td>Ready</td></tr></table>
+    `);
+
+    const plan = createConfluenceNativeDocPlan(intent);
+
+    expect(plan.title).toBe("Release Notes");
+    expect(plan.outline).toEqual(["# Release Notes"]);
+    expect(plan.operations.map((operation) => operation.id)).toContain("op-document-flow");
+    expect(plan.operations.map((operation) => operation.id)).toContain("op-tables");
+    expect(plan.prompt).toContain("Document intent JSON");
+    expect(plan.prompt).toContain("Create or update a Confluence page");
   });
 });
