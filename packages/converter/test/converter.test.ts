@@ -59,4 +59,34 @@ describe("convertHtmlToClipboardPayload", () => {
     expect(result.html).toContain("color: red");
     expect(result.warnings.map((warning) => warning.code)).toContain("pro-locked");
   });
+
+  it("normalizes dark pasted table styles to readable light styles", () => {
+    const result = convertHtmlToClipboardPayload(
+      `<table><tr><td style="background-color: rgb(0, 0, 0); color: rgb(20, 20, 20)">Hidden</td></tr></table>`,
+      {
+        target: "confluence",
+        mode: "confluence-pro",
+        licenseStatus: "pro"
+      }
+    );
+
+    expect(result.html).toContain("background-color: #f7f8f9");
+    expect(result.html).toContain("color: #172b4d");
+    expect(result.text).toContain("Hidden");
+  });
+
+  it("rewrites compact report tags to visible Confluence-friendly badges", () => {
+    const result = convertHtmlToClipboardPayload(
+      `<span class="t t1" style="color: rgb(255, 255, 255); background-color: rgb(22, 163, 74)">트랙1 정리</span>`,
+      {
+        target: "confluence",
+        mode: "confluence-pro",
+        licenseStatus: "pro"
+      }
+    );
+
+    expect(result.html).toContain("color: #166534");
+    expect(result.html).toContain("background-color: #ecfdf3");
+    expect(result.html).toContain("트랙1 정리");
+  });
 });

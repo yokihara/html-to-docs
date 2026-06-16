@@ -16,7 +16,6 @@ const SNAPSHOT_STYLE_PROPERTIES = [
   "border-collapse",
   "border-radius",
   "box-sizing",
-  "display",
   "font-family",
   "font-size",
   "font-weight",
@@ -39,10 +38,6 @@ const SNAPSHOT_STYLE_PROPERTIES = [
   "margin-bottom",
   "margin-left",
   "overflow",
-  "align-items",
-  "flex-wrap",
-  "gap",
-  "justify-content",
   "letter-spacing"
 ] as const;
 
@@ -241,7 +236,52 @@ async function snapshotHtmlFromString(html: string): Promise<string> {
 }
 
 function stripScripts(html: string): string {
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+  return removePrefersColorSchemeDarkBlocks(
+    html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+  );
+}
+
+function removePrefersColorSchemeDarkBlocks(html: string): string {
+  const mediaPattern = /@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{/gi;
+  let output = "";
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = mediaPattern.exec(html))) {
+    const start = match.index;
+    const blockStart = mediaPattern.lastIndex - 1;
+    const blockEnd = findCssBlockEnd(html, blockStart);
+
+    if (blockEnd === -1) {
+      break;
+    }
+
+    output += html.slice(cursor, start);
+    cursor = blockEnd + 1;
+    mediaPattern.lastIndex = cursor;
+  }
+
+  return output + html.slice(cursor);
+}
+
+function findCssBlockEnd(source: string, openingBraceIndex: number): number {
+  let depth = 0;
+
+  for (let index = openingBraceIndex; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "{") {
+      depth += 1;
+    }
+
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+
+  return -1;
 }
 
 function snapshotDocumentForPaste(sourceDocument: Document): string {
@@ -292,7 +332,6 @@ function snapshotCurrentPageForHtmlToDocs(): string {
     "border-collapse",
     "border-radius",
     "box-sizing",
-    "display",
     "font-family",
     "font-size",
     "font-weight",
@@ -315,10 +354,6 @@ function snapshotCurrentPageForHtmlToDocs(): string {
     "margin-bottom",
     "margin-left",
     "overflow",
-    "align-items",
-    "flex-wrap",
-    "gap",
-    "justify-content",
     "letter-spacing"
   ];
   const sourceBody = document.body;

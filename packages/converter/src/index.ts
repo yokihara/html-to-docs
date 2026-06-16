@@ -42,7 +42,6 @@ const BASIC_STYLE_ALLOWLIST = new Set([
   "border-collapse",
   "border-radius",
   "box-sizing",
-  "display",
   "font-family",
   "font-size",
   "padding",
@@ -69,12 +68,47 @@ const BASIC_STYLE_ALLOWLIST = new Set([
 
 const PRO_STYLE_ALLOWLIST = new Set([
   ...BASIC_STYLE_ALLOWLIST,
-  "align-items",
-  "flex-wrap",
-  "gap",
-  "justify-content",
   "letter-spacing"
 ]);
+
+const NAMED_PATTERN_STYLES: Record<string, Record<string, string>> = {
+  t1: {
+    color: "#166534",
+    "background-color": "#ecfdf3",
+    border: "1px solid #bbf7d0",
+    "border-radius": "10px",
+    padding: "1px 8px",
+    "font-weight": "700"
+  },
+  t2: {
+    color: "#5b21b6",
+    "background-color": "#f5f0ff",
+    border: "1px solid #ddd6fe",
+    "border-radius": "10px",
+    padding: "1px 8px",
+    "font-weight": "700"
+  },
+  ptag: {
+    color: "#0c1f3f",
+    "background-color": "#eef7ff",
+    border: "1px solid #b9dcff",
+    "border-radius": "10px",
+    padding: "2px 9px",
+    "font-weight": "700"
+  },
+  ok: {
+    color: "#166534",
+    "font-weight": "700"
+  },
+  warn: {
+    color: "#92400e",
+    "font-weight": "700"
+  },
+  bad: {
+    color: "#991b1b",
+    "font-weight": "700"
+  }
+};
 
 export function convertHtmlToClipboardPayload(
   sourceHtml: string,
@@ -137,10 +171,20 @@ function sanitizeNode(
 
 function rewriteReportPattern(element: Element, mode: ConversionMode): void {
   const className = String(element.getAttribute("class") ?? "").toLowerCase();
+  const classList = className.split(/\s+/).filter(Boolean);
   const role = String(element.getAttribute("role") ?? "").toLowerCase();
-  const isCard = /card|panel|tile/.test(className);
-  const isBadge = /badge|pill|tag|status/.test(className);
-  const isCallout = /callout|alert|note|warning|info/.test(className) || role === "note";
+  const isCard = /card|panel|tile|phase|step/.test(className);
+  const isBadge = /badge|pill|tag|status|ptag/.test(className) || classList.includes("t");
+  const isCallout = /callout|alert|note|warning|info|tldr|danger/.test(className) || role === "note";
+
+  for (const classToken of classList) {
+    const style = NAMED_PATTERN_STYLES[classToken];
+    if (!style) {
+      continue;
+    }
+
+    element.setAttribute("style", mergeInlineStyle(element.getAttribute("style"), style));
+  }
 
   if (isCard) {
     element.setAttribute("data-html-to-docs", "card");
@@ -182,7 +226,8 @@ function rewriteReportPattern(element: Element, mode: ConversionMode): void {
           "border-radius": "6px",
           padding: "12px",
           margin: "12px 0",
-          "background-color": "#f7f8f9"
+          "background-color": className.includes("danger") ? "#fff7ed" : "#f7f8f9",
+          color: "#172b4d"
         })
       );
     }
@@ -208,8 +253,9 @@ function sanitizeAttributes(
 
     if (name === "style") {
       const filteredStyle = filterInlineStyle(attribute.value, mode);
-      if (filteredStyle) {
-        element.setAttribute("style", filteredStyle);
+      const readableStyle = normalizeStyleForReadablePaste(filteredStyle, element.tagName);
+      if (readableStyle) {
+        element.setAttribute("style", readableStyle);
       } else {
         element.removeAttribute("style");
         pushWarningOnce(warnings, {
@@ -246,6 +292,109 @@ function sanitizeAttributes(
   }
 }
 
+function normalizeStyleForReadablePaste(style: string, tagName: string): string {
+  if (!style) {
+    return "";
+  }
+
+  const styles = parseStyle(style);
+  const background = styles.get("background-color");
+  const color = styles.get("color");
+
+  if (background && isDarkColor(background)) {
+    styles.set("background-color", isTableSection(tagName) ? "#f7f8f9" : "#ffffff");
+    if (!color || isDarkColor(color) || isLightColor(color)) {
+      styles.set("color", "#172b4d");
+    }
+  }
+
+  if (color && isLightColor(color) && (!background || !isDarkColor(background))) {
+    styles.set("color", "#172b4d");
+  }
+
+  return serializeStyle(styles);
+}
+
+function parseStyle(style: string): Map<string, string> {
+  const styles = new Map<string, string>();
+
+  for (const part of style.split(";")) {
+    const [rawProperty, ...rawValueParts] = part.split(":");
+    const rawValue = rawValueParts.join(":");
+    if (!rawProperty || !rawValue) {
+      continue;
+    }
+
+    styles.set(rawProperty.trim().toLowerCase(), rawValue.trim());
+  }
+
+  return styles;
+}
+
+function serializeStyle(styles: Map<string, string>): string {
+  return Array.from(styles.entries())
+    .map(([property, value]) => `${property}: ${value}`)
+    .join("; ");
+}
+
+function isTableSection(tagName: string): boolean {
+  return tagName === "TD" || tagName === "TH" || tagName === "TR" || tagName === "TABLE";
+}
+
+function isDarkColor(value: string): boolean {
+  const rgb = parseRgb(value);
+  if (!rgb) {
+    return false;
+  }
+
+  return relativeLuminance(rgb) < 0.18;
+}
+
+function isLightColor(value: string): boolean {
+  const rgb = parseRgb(value);
+  if (!rgb) {
+    return false;
+  }
+
+  return relativeLuminance(rgb) > 0.82;
+}
+
+function parseRgb(value: string): [number, number, number] | null {
+  const rgbMatch = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (rgbMatch) {
+    return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])];
+  }
+
+  const hexMatch = value.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!hexMatch) {
+    return null;
+  }
+
+  const hex = hexMatch[1];
+  const expanded =
+    hex.length === 3
+      ? hex
+          .split("")
+          .map((char) => `${char}${char}`)
+          .join("")
+      : hex;
+
+  return [
+    Number.parseInt(expanded.slice(0, 2), 16),
+    Number.parseInt(expanded.slice(2, 4), 16),
+    Number.parseInt(expanded.slice(4, 6), 16)
+  ];
+}
+
+function relativeLuminance([red, green, blue]: [number, number, number]): number {
+  const [r, g, b] = [red, green, blue].map((channel) => {
+    const value = channel / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 function filterInlineStyle(style: string, mode: ConversionMode): string {
   const allowlist = mode === "confluence-pro" ? PRO_STYLE_ALLOWLIST : BASIC_STYLE_ALLOWLIST;
 
@@ -266,21 +415,15 @@ function mergeInlineStyle(
 ): string {
   const styles = new Map<string, string>();
 
-  for (const part of (currentStyle ?? "").split(";")) {
-    const [rawProperty, rawValue] = part.split(":");
-    if (!rawProperty || !rawValue) {
-      continue;
-    }
-    styles.set(rawProperty.trim().toLowerCase(), rawValue.trim());
+  for (const [property, value] of parseStyle(currentStyle ?? "")) {
+    styles.set(property, value);
   }
 
   for (const [property, value] of Object.entries(additions)) {
     styles.set(property, value);
   }
 
-  return Array.from(styles.entries())
-    .map(([property, value]) => `${property}: ${value}`)
-    .join("; ");
+  return serializeStyle(styles);
 }
 
 function isLayoutOnly(element: Element): boolean {
