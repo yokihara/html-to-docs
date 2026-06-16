@@ -1,5 +1,5 @@
 import { convertHtmlToClipboardPayload } from "@html-to-docs/converter";
-import type { ConversionMode, TabHtmlResponse } from "@html-to-docs/shared";
+import type { ClipboardPayload, ConversionMode } from "@html-to-docs/shared";
 import "./styles.css";
 
 type SourceMode = "tab" | "file";
@@ -135,12 +135,7 @@ async function copyForConfluence(): Promise<void> {
   });
 
   try {
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        "text/html": new Blob([payload.html], { type: "text/html" }),
-        "text/plain": new Blob([payload.text], { type: "text/plain" })
-      })
-    ]);
+    await writeClipboardPayload(payload);
     render(
       i18n("copied"),
       payload.warnings.map((warning) => warning.message)
@@ -157,11 +152,71 @@ async function captureCurrentTabHtml(): Promise<string | null> {
     return null;
   }
 
-  const response = await chrome.tabs.sendMessage<unknown, TabHtmlResponse>(tab.id, {
-    type: "HTML_TO_DOCS_CAPTURE_TAB"
-  });
+  try {
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => document.documentElement.outerHTML
+    });
 
-  return response.html ?? null;
+    return typeof result?.result === "string" ? result.result : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeClipboardPayload(payload: ClipboardPayload): Promise<void> {
+  if (navigator.clipboard && typeof ClipboardItem !== "undefined") {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([payload.html], { type: "text/html" }),
+          "text/plain": new Blob([payload.text], { type: "text/plain" })
+        })
+      ]);
+      return;
+    } catch {
+      // Fall through to execCommand. Chrome extension popups can be picky here.
+    }
+  }
+
+  copyWithSelectionFallback(payload);
+}
+
+function copyWithSelectionFallback(payload: ClipboardPayload): void {
+  const container = document.createElement("div");
+  container.contentEditable = "true";
+  container.style.position = "fixed";
+  container.style.left = "-9999px";
+  container.style.top = "0";
+  container.style.width = "1px";
+  container.style.height = "1px";
+  container.style.overflow = "hidden";
+  container.innerHTML = payload.html;
+
+  const onCopy = (event: ClipboardEvent): void => {
+    event.preventDefault();
+    event.clipboardData?.setData("text/html", payload.html);
+    event.clipboardData?.setData("text/plain", payload.text);
+  };
+
+  document.body.append(container);
+  document.addEventListener("copy", onCopy);
+
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(container);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  const copied = document.execCommand("copy");
+
+  document.removeEventListener("copy", onCopy);
+  selection?.removeAllRanges();
+  container.remove();
+
+  if (!copied) {
+    throw new Error("Clipboard fallback failed.");
+  }
 }
 
 function escapeHtml(value: string): string {
