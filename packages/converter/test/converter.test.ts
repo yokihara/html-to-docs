@@ -118,7 +118,7 @@ describe("native document planning", () => {
     );
   });
 
-  it("creates a Confluence-native operation plan and MCP prompt", () => {
+  it("creates a Confluence-native operation plan and MCP execution payload", () => {
     const intent = extractDocumentIntent(`
       <h1>Release Notes</h1>
       <p>Ship the native doc workflow first.</p>
@@ -132,7 +132,9 @@ describe("native document planning", () => {
     expect(plan.outline).toEqual(["# Release Notes"]);
     expect(plan.operations.map((operation) => operation.id)).toContain("op-document-flow");
     expect(plan.operations.map((operation) => operation.id)).toContain("op-tables");
-    expect(plan.prompt).toContain("Document intent JSON");
-    expect(plan.prompt).toContain("Create or update a Confluence page");
+    expect(plan.bodyMarkdown).toContain("# Release Notes");
+    expect(plan.bodyMarkdown).toContain("| Area | Status |");
+    expect(plan.executionPayload.tool).toBe("atlassian-rovo.createConfluencePage");
+    expect(plan.executionPayload.body).toBe(plan.bodyMarkdown);
   });
 });

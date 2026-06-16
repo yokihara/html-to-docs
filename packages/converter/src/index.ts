@@ -6,6 +6,7 @@ import type {
   DocumentIntent,
   DocumentIntentBlock,
   DocumentIntentTone,
+  NativeDocExecutionPayload,
   NativeDocOperation,
   NativeDocPlan
 } from "@html-to-docs/shared";
@@ -186,6 +187,7 @@ export function createConfluenceNativeDocPlan(intent: DocumentIntent): NativeDoc
     `${intent.stats.tables} tables`,
     `${intent.stats.codeBlocks} code blocks`
   ].join(" · ");
+  const bodyMarkdown = renderConfluenceMarkdown(intent);
 
   return {
     target: "confluence",
@@ -193,7 +195,8 @@ export function createConfluenceNativeDocPlan(intent: DocumentIntent): NativeDoc
     summary,
     outline,
     operations,
-    prompt: createConfluencePrompt(intent, operations),
+    bodyMarkdown,
+    executionPayload: createMcpExecutionPayload(intent.title, bodyMarkdown),
     intent
   };
 }
@@ -674,42 +677,6 @@ function createNativeDocOperations(blocks: DocumentIntentBlock[]): NativeDocOper
   return operations;
 }
 
-function createConfluencePrompt(
-  intent: DocumentIntent,
-  operations: NativeDocOperation[]
-): string {
-  const intentJson = JSON.stringify(
-    {
-      title: intent.title,
-      blocks: intent.blocks
-    },
-    null,
-    2
-  );
-  const operationText = operations
-    .map((operation) => `- ${operation.label}: ${operation.description}`)
-    .join("\n");
-
-  return [
-    "Create or update a Confluence page from the document intent below.",
-    "",
-    "Rules:",
-    "- Use native Confluence structures wherever possible.",
-    "- Preserve the source language and wording.",
-    "- Convert headings to page headings, lists to lists, tables to editable tables, code to code blocks, and callouts to Confluence panels.",
-    "- Do not try to preserve pixel-perfect HTML styling.",
-    "- Ask for the target space/page only if it is missing.",
-    "",
-    "Planned operations:",
-    operationText || "- Build the page from the extracted document intent.",
-    "",
-    "Document intent JSON:",
-    "```json",
-    intentJson,
-    "```"
-  ].join("\n");
-}
-
 function isIntentCallout(element: Element): boolean {
   const className = String(element.getAttribute("class") ?? "").toLowerCase();
   const role = String(element.getAttribute("role") ?? "").toLowerCase();
@@ -755,6 +722,87 @@ function normalizeInlineText(text: string): string {
 
 function trimPreservingCode(text: string): string {
   return text.replace(/^\n+|\n+$/g, "");
+}
+
+function renderConfluenceMarkdown(intent: DocumentIntent): string {
+  return intent.blocks
+    .map((block) => renderIntentBlockMarkdown(block))
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+}
+
+function renderIntentBlockMarkdown(block: DocumentIntentBlock): string {
+  switch (block.type) {
+    case "heading":
+      return `${"#".repeat(block.level ?? 1)} ${block.text ?? ""}`.trim();
+    case "paragraph":
+      return block.text ?? "";
+    case "callout":
+      return renderCalloutMarkdown(block);
+    case "list":
+      return renderListMarkdown(block);
+    case "table":
+      return renderTableMarkdown(block);
+    case "code":
+      return renderCodeMarkdown(block);
+    case "divider":
+      return "---";
+    default:
+      return "";
+  }
+}
+
+function renderCalloutMarkdown(block: DocumentIntentBlock): string {
+  const labelByTone: Record<DocumentIntentTone, string> = {
+    info: "Info",
+    success: "Success",
+    warning: "Warning",
+    danger: "Important",
+    neutral: "Note"
+  };
+  const label = labelByTone[block.tone ?? "neutral"];
+  return `> **${label}:** ${block.text ?? ""}`.trim();
+}
+
+function renderListMarkdown(block: DocumentIntentBlock): string {
+  return (block.items ?? [])
+    .map((item, index) => (block.ordered ? `${index + 1}. ${item}` : `- ${item}`))
+    .join("\n");
+}
+
+function renderTableMarkdown(block: DocumentIntentBlock): string {
+  const rows = block.rows ?? [];
+  const headers = block.headers?.length ? block.headers : rows[0] ?? [];
+  const bodyRows = block.headers?.length ? rows : rows.slice(1);
+
+  if (headers.length === 0) {
+    return "";
+  }
+
+  return [
+    `| ${headers.map(escapeMarkdownTableCell).join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
+    ...bodyRows.map((row) => `| ${row.map(escapeMarkdownTableCell).join(" | ")} |`)
+  ].join("\n");
+}
+
+function renderCodeMarkdown(block: DocumentIntentBlock): string {
+  return [`\`\`\`${block.language ?? ""}`, block.text ?? "", "```"].join("\n");
+}
+
+function escapeMarkdownTableCell(value: string): string {
+  return value.replace(/\|/g, "\\|").replace(/\n/g, " ");
+}
+
+function createMcpExecutionPayload(title: string, body: string): NativeDocExecutionPayload {
+  return {
+    tool: "atlassian-rovo.createConfluencePage",
+    contentFormat: "markdown",
+    title,
+    body,
+    requiredInputs: ["cloudId", "spaceId", "parentId or explicit create location"]
+  };
 }
 
 function normalizeWhitespace(html: string): string {

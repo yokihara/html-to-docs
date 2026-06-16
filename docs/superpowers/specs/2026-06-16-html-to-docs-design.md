@@ -38,7 +38,7 @@ The product is not a pixel-perfect page importer. It is a bridge from agent outp
 
 - Provide a Chrome extension MVP with current-tab and local `.html` file inputs.
 - Extract a platform-neutral document intent model from agent-generated HTML reports.
-- Generate a Confluence-native prompt or MCP-ready action plan from that model.
+- Generate a Confluence-native body and MCP-ready action plan from that model.
 - Keep `Copy Clean` as the free fallback path for readable clipboard paste.
 - Preserve document editability for headings, paragraphs, lists, tables, code blocks, links, images, callouts, and status-like labels.
 - Establish a renderer architecture that can later support Notion, Obsidian, and other documentation tools.
@@ -86,7 +86,7 @@ Responsibilities:
 - Let users choose the target, initially Confluence.
 - Call the converter package to extract a document intent model.
 - Offer `Copy Clean` for conservative clipboard output.
-- Offer `Native Doc Mode` for Confluence MCP/prompt output.
+- Offer `Native Doc Mode` for direct Confluence MCP execution by an agent.
 - Show concise success and failure states.
 - Surface Pro/MCP workflow as a locked, preview, or mock-gated capability until licensing is implemented.
 - Localize all user-facing extension UI strings in English and Korean.
@@ -138,7 +138,7 @@ Output:
 
 - platform-neutral document intent model
 - `Copy Clean` clipboard payload
-- Confluence-native prompt or MCP-ready action payload
+- Confluence-native body and MCP-ready action payload
 - warnings about ambiguous or simplified content
 
 Initial responsibilities:
@@ -215,7 +215,7 @@ Confluence `Copy Clean` renderer:
 
 Confluence `Native Doc Mode` renderer:
 
-- prompt/instructions for an agent with Atlassian MCP access
+- execution payload for an agent with Atlassian MCP access
 - target page title, parent/page selection hints, and structured blocks
 - explicit mapping from callout/status/table/code intent to Confluence-native capabilities
 - update/create safety checklist before writing
@@ -248,7 +248,7 @@ Pro should focus on native workflow, not marginally prettier paste.
 It should:
 
 - generate a Confluence-native document plan from the intent model
-- prepare an Atlassian MCP prompt/action payload
+- prepare an Atlassian MCP action payload for direct tool execution
 - optionally create or update a Confluence page when the user has MCP connected and confirms the action
 - preserve callout/status/table/code intent through Confluence-native structures where possible
 - show a preview of the document outline and target operations before execution
@@ -316,7 +316,7 @@ Free:
 Pro:
 
 - Native Doc Mode
-- Confluence MCP prompt/action payload generation
+- Confluence MCP action payload generation
 - guided Confluence create/update flow when MCP is available
 - richer document intent inspection
 - warnings that explain ambiguous blocks and target limitations
@@ -343,7 +343,7 @@ Converter tests:
 - fixture HTML input
 - document intent model snapshots
 - Copy Clean output snapshots
-- Confluence native prompt/action snapshots
+- Confluence native body/action snapshots
 - text fallback snapshots
 - warning/error snapshots
 - sanitizer tests for hostile HTML
@@ -396,14 +396,14 @@ The first QA checklist should verify:
 - introduce document intent model types
 - refactor converter into extraction plus target renderers
 - create `copy-clean` renderer
-- create Confluence native prompt/action renderer
+- create Confluence native body/action renderer
 - preserve current clipboard behavior as fallback
 - add model snapshot tests
 
 ### Phase 3: Atlassian MCP Native Doc Mode
 
 - detect whether Atlassian MCP/Rovo workflow is available where possible
-- generate MCP-ready prompts/actions for Confluence create/update
+- generate MCP-ready actions for Confluence create/update
 - add review-before-write UX
 - support title, parent/page hints, and page update safety
 - document MCP limitations and required user confirmation

@@ -71,10 +71,6 @@
     "message": "Pro Native Doc Plan을 만들었습니다.",
     "description": "Status after creating the native document preview."
   },
-  "nativeDocPlanMissing": {
-    "message": "먼저 Native Doc Plan을 만드세요.",
-    "description": "Missing native plan status."
-  },
   "nativeDocPlanLabel": {
     "message": "Pro 로컬 미리보기",
     "description": "Native document plan section label."
@@ -87,16 +83,12 @@
     "message": "Confluence 작업 계획",
     "description": "Native operation preview heading."
   },
-  "mcpPromptLabel": {
-    "message": "MCP 프롬프트",
-    "description": "MCP prompt preview heading."
+  "nativePageBodyLabel": {
+    "message": "Confluence 본문",
+    "description": "Native Confluence markdown body preview heading."
   },
-  "copyMcpPrompt": {
-    "message": "MCP 프롬프트 복사",
-    "description": "Copy MCP prompt button."
-  },
-  "mcpPromptCopied": {
-    "message": "MCP 프롬프트를 복사했습니다.",
-    "description": "Successful MCP prompt copy status."
+  "executionPayloadLabel": {
+    "message": "MCP 실행 payload",
+    "description": "MCP execution payload preview heading."
   }
 }

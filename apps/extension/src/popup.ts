@@ -167,11 +167,14 @@ function renderNativeDocPlan(plan: NativeDocPlan): string {
       </section>
 
       <section class="preview-group">
-        <h3>${i18n("mcpPromptLabel")}</h3>
-        <pre>${escapeHtml(plan.prompt)}</pre>
+        <h3>${i18n("nativePageBodyLabel")}</h3>
+        <pre>${escapeHtml(plan.bodyMarkdown)}</pre>
       </section>
 
-      <button id="copy-prompt" class="secondary">${i18n("copyMcpPrompt")}</button>
+      <section class="preview-group">
+        <h3>${i18n("executionPayloadLabel")}</h3>
+        <pre>${escapeHtml(JSON.stringify(plan.executionPayload, null, 2))}</pre>
+      </section>
     </section>
   `;
 }
@@ -211,7 +214,6 @@ function bindEvents(): void {
   });
 
   root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyForConfluence);
-  root.querySelector<HTMLButtonElement>("#copy-prompt")?.addEventListener("click", copyNativeDocPrompt);
 }
 
 async function copyForConfluence(): Promise<void> {
@@ -241,20 +243,6 @@ async function copyForConfluence(): Promise<void> {
       i18n("copied"),
       payload.warnings.map((warning) => warning.message)
     );
-  } catch {
-    render(i18n("copyFailed"));
-  }
-}
-
-async function copyNativeDocPrompt(): Promise<void> {
-  if (!state.nativeDocPlan) {
-    render(i18n("nativeDocPlanMissing"));
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(state.nativeDocPlan.prompt);
-    render(i18n("mcpPromptCopied"));
   } catch {
     render(i18n("copyFailed"));
   }

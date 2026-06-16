@@ -21,7 +21,7 @@ tags:
 
 `html-to-docs`는 AI agent output을 팀 문서 도구의 native/editable 문서로 옮기는 도구입니다.
 
-초기 clipboard-first 아이디어는 fallback으로 유효하지만, 실제 테스트 결과 Confluence Cloud가 붙여넣은 HTML/CSS를 많이 정리하거나 제거해서 `더 예쁜 paste`만으로는 Pro 차별점이 약합니다. 수정된 MVP는 agent output에서 문서 의도 모델을 추출하고, 최종 산출물이 만들어지기 전에 Confluence-native prompt 또는 Atlassian MCP-ready output을 만드는 방향으로 갑니다.
+초기 clipboard-first 아이디어는 fallback으로 유효하지만, 실제 테스트 결과 Confluence Cloud가 붙여넣은 HTML/CSS를 많이 정리하거나 제거해서 `더 예쁜 paste`만으로는 Pro 차별점이 약합니다. 수정된 MVP는 agent output에서 문서 의도 모델을 추출하고, agent가 Atlassian MCP를 직접 호출할 수 있는 Confluence-native body/action payload를 만드는 방향으로 갑니다.
 
 첫 대상은 여전히 Confluence입니다. 다만 Notion과 Obsidian도 같은 문서 의도 모델에서 renderer만 바꿔 붙일 수 있어야 하므로, core는 Confluence-specific paste rule에 묶이면 안 됩니다.
 
@@ -35,7 +35,7 @@ tags:
 2. 보고서는 브라우저에서는 예쁘지만, Confluence에 붙여넣으면 디자인과 구조가 크게 깨집니다.
 3. 사용자는 제목, 표, callout, status badge, 코드블록을 수동으로 다시 만들지 않고 editable Confluence page/section을 얻고 싶습니다.
 4. 도구는 HTML에서 section, callout, status marker, table, code block, list, emphasis 같은 문서 의도를 추출합니다.
-5. Atlassian MCP가 있으면 Confluence-native create/update workflow에 쓸 prompt/action payload를 준비합니다.
+5. Atlassian MCP가 있으면 agent가 Confluence-native create/update tool을 직접 호출합니다.
 6. MCP가 없으면 `Copy Clean` fallback으로 읽기 좋은 clipboard payload를 제공합니다.
 
 이 제품은 pixel-perfect page importer가 아닙니다. Agent output을 문서 도구가 이해할 수 있는 native structure로 옮기는 bridge입니다. HTML paste는 rescue path이지, 장기 premium value가 아닙니다.
@@ -44,7 +44,7 @@ tags:
 
 - 현재 탭과 로컬 `.html` 파일을 입력으로 받는 Chrome extension MVP를 제공합니다.
 - Agent-generated HTML report에서 platform-neutral document intent model을 추출합니다.
-- 그 모델에서 Confluence-native prompt 또는 MCP-ready action plan을 생성합니다.
+- 그 모델에서 Confluence-native body와 MCP-ready action plan을 생성합니다.
 - `Copy Clean`을 무료 fallback path로 제공합니다.
 - 제목, 문단, 리스트, 표, 코드블록, 링크, 이미지, callout의 편집 가능성을 보존합니다.
 - 나중에 Notion, Obsidian, 기타 문서 도구를 지원할 수 있는 renderer architecture를 만듭니다.
@@ -92,7 +92,7 @@ html-to-docs/
 - target을 선택하게 합니다. 초기 target은 Confluence입니다.
 - 선택된 HTML source를 converter package에 전달해 document intent model을 추출합니다.
 - `Copy Clean` fallback으로 보수적인 clipboard output을 제공합니다.
-- `Native Doc Mode`로 Confluence MCP/prompt output을 제공합니다.
+- `Native Doc Mode`로 agent의 Confluence MCP 직접 실행 payload를 제공합니다.
 - 간결한 성공/실패 상태를 보여줍니다.
 - licensing 구현 전까지 Pro/MCP workflow를 locked, preview, 또는 mock-gated capability로 노출합니다.
 - 사용자에게 보이는 모든 extension UI string을 영어와 한국어로 localize합니다.
@@ -144,7 +144,7 @@ Content script는 Chrome permission, restricted scheme, sandboxing, local file s
 
 - platform-neutral document intent model
 - `Copy Clean` clipboard payload
-- Confluence-native prompt 또는 MCP-ready action payload
+- Confluence-native body와 MCP-ready action payload
 - 모호하거나 단순화된 content에 대한 warning
 
 초기 책임:
@@ -221,7 +221,7 @@ Confluence `Copy Clean` renderer:
 
 Confluence `Native Doc Mode` renderer:
 
-- Atlassian MCP access가 있는 agent를 위한 prompt/instruction
+- Atlassian MCP access가 있는 agent를 위한 execution payload
 - target page title, parent/page selection hint, structured block
 - callout/status/table/code intent를 Confluence-native capability로 매핑
 - write 전에 update/create safety checklist 제공
@@ -254,7 +254,7 @@ Pro는 marginally prettier paste가 아니라 native workflow에 집중합니다
 해야 할 일:
 
 - intent model에서 Confluence-native document plan 생성
-- Atlassian MCP prompt/action payload 준비
+- Atlassian MCP action payload 준비
 - 사용자가 MCP를 연결했고 action을 확인하면 Confluence page create/update까지 지원
 - callout/status/table/code intent를 가능한 Confluence-native structure로 보존
 - 실행 전 document outline과 target operation preview 제공
@@ -322,7 +322,7 @@ Free:
 Pro:
 
 - Native Doc Mode
-- Confluence MCP prompt/action payload generation
+- Confluence MCP action payload generation
 - MCP가 있을 때 guided Confluence create/update flow
 - 더 풍부한 document intent inspection
 - ambiguous block과 target limitation에 대한 warning
@@ -349,7 +349,7 @@ Converter test:
 - fixture HTML input
 - document intent model snapshot
 - Copy Clean output snapshot
-- Confluence native prompt/action snapshot
+- Confluence native body/action snapshot
 - text fallback snapshot
 - warning/error snapshot
 - hostile HTML sanitizer test
@@ -402,14 +402,14 @@ Extension test:
 - document intent model type 도입
 - converter를 extraction과 target renderer로 분리
 - `copy-clean` renderer 생성
-- Confluence native prompt/action renderer 생성
+- Confluence native body/action renderer 생성
 - 현재 clipboard behavior는 fallback으로 유지
 - model snapshot test 추가
 
 ### Phase 3: Atlassian MCP Native Doc Mode
 
 - 가능한 경우 Atlassian MCP/Rovo workflow 가용 여부 감지
-- Confluence create/update용 MCP-ready prompt/action 생성
+- Confluence create/update용 MCP-ready action 생성
 - review-before-write UX 추가
 - title, parent/page hint, page update safety 지원
 - MCP limitation과 user confirmation requirement 문서화

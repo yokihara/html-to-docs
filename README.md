@@ -4,7 +4,7 @@ Chrome extension for moving AI-generated HTML reports into Confluence as editabl
 
 The MVP is a free public release candidate with English and Korean UI. Pro conversion is represented as a locked upgrade path until licensing is implemented.
 
-Current local builds enable Pro preview so the Native Doc Plan can be tested before billing or MCP execution is connected. In Pro mode, the popup extracts document intent, previews the Confluence operation plan, and exposes an MCP-ready prompt.
+Current local builds enable Pro preview so the Native Doc Plan can be tested before billing or MCP execution is connected. In Pro mode, the popup extracts document intent, previews the Confluence operation plan, and exposes the markdown body and MCP execution payload that an agent can use to call Atlassian tools directly.
 
 ## Workspace
 

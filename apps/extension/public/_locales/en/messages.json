@@ -71,10 +71,6 @@
     "message": "Created the Pro Native Doc Plan.",
     "description": "Status after creating the native document preview."
   },
-  "nativeDocPlanMissing": {
-    "message": "Create a Native Doc Plan first.",
-    "description": "Missing native plan status."
-  },
   "nativeDocPlanLabel": {
     "message": "Pro local preview",
     "description": "Native document plan section label."
@@ -87,16 +83,12 @@
     "message": "Confluence operation plan",
     "description": "Native operation preview heading."
   },
-  "mcpPromptLabel": {
-    "message": "MCP prompt",
-    "description": "MCP prompt preview heading."
+  "nativePageBodyLabel": {
+    "message": "Confluence body",
+    "description": "Native Confluence markdown body preview heading."
   },
-  "copyMcpPrompt": {
-    "message": "Copy MCP prompt",
-    "description": "Copy MCP prompt button."
-  },
-  "mcpPromptCopied": {
-    "message": "Copied the MCP prompt.",
-    "description": "Successful MCP prompt copy status."
+  "executionPayloadLabel": {
+    "message": "MCP execution payload",
+    "description": "MCP execution payload preview heading."
   }
 }

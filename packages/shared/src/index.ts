@@ -73,13 +73,22 @@ export interface NativeDocOperation {
   blockIds: string[];
 }
 
+export interface NativeDocExecutionPayload {
+  tool: "atlassian-rovo.createConfluencePage" | "atlassian-rovo.updateConfluencePage";
+  contentFormat: "markdown";
+  title: string;
+  body: string;
+  requiredInputs: string[];
+}
+
 export interface NativeDocPlan {
   target: TargetPlatform;
   title: string;
   summary: string;
   outline: string[];
   operations: NativeDocOperation[];
-  prompt: string;
+  bodyMarkdown: string;
+  executionPayload: NativeDocExecutionPayload;
   intent: DocumentIntent;
 }
 
