@@ -64,15 +64,15 @@
     "description": "Mode selector label."
   },
   "previewNativeDocPlan": {
-    "message": "Preview Native Doc Plan",
+    "message": "Preview Local Rovo MCP",
     "description": "Primary action for local Pro preview."
   },
   "nativeDocPlanReady": {
-    "message": "Created the Pro Native Doc Plan.",
+    "message": "Created the local Rovo MCP execution payload.",
     "description": "Status after creating the native document preview."
   },
   "nativeDocPlanLabel": {
-    "message": "Pro local preview",
+    "message": "Rovo MCP local preview",
     "description": "Native document plan section label."
   },
   "outlineLabel": {

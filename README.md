@@ -1,10 +1,10 @@
 # html-to-docs
 
-Chrome extension for moving AI-generated HTML reports into Confluence as editable, docs-native content.
+Chrome extension for copying AI-generated HTML reports into Confluence as editable, service-ready content.
 
 The MVP is a free public release candidate with English and Korean UI. Pro conversion is represented as a locked upgrade path until licensing is implemented.
 
-Current local builds enable Pro preview so the Native Doc Plan can be tested before billing or MCP execution is connected. In Pro mode, the popup extracts document intent, previews the Confluence operation plan, and exposes the markdown body and MCP execution payload that an agent can use to call Atlassian tools directly.
+Current local builds enable Pro conversion so richer Confluence-ready clipboard output can be tested before billing is connected. In Pro mode, the popup also exposes a secondary local Rovo MCP preview that an agent can use to call Atlassian tools directly.
 
 ## Workspace
 

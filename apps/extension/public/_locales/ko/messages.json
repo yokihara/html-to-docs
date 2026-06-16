@@ -64,15 +64,15 @@
     "description": "Mode selector label."
   },
   "previewNativeDocPlan": {
-    "message": "Native Doc Plan 미리보기",
+    "message": "로컬 Rovo MCP 미리보기",
     "description": "Primary action for local Pro preview."
   },
   "nativeDocPlanReady": {
-    "message": "Pro Native Doc Plan을 만들었습니다.",
+    "message": "로컬 Rovo MCP 실행 payload를 만들었습니다.",
     "description": "Status after creating the native document preview."
   },
   "nativeDocPlanLabel": {
-    "message": "Pro 로컬 미리보기",
+    "message": "Rovo MCP 로컬 미리보기",
     "description": "Native document plan section label."
   },
   "outlineLabel": {

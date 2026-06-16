@@ -108,9 +108,12 @@ function render(status = "", warnings: string[] = []): void {
         ${state.conversionMode === "confluence-pro" ? `<p class="notice">${i18n("proPreview")}</p>` : ""}
       </section>
 
-      <button id="copy" class="primary">
-        ${state.conversionMode === "confluence-pro" ? i18n("previewNativeDocPlan") : i18n("copyForConfluence")}
-      </button>
+      <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
+      ${
+        state.conversionMode === "confluence-pro"
+          ? `<button id="mcp-preview" class="secondary">${i18n("previewNativeDocPlan")}</button>`
+          : ""
+      }
 
       <p id="status" class="status">${status}</p>
       ${warnings.length > 0 ? renderWarnings(warnings) : ""}
@@ -214,6 +217,7 @@ function bindEvents(): void {
   });
 
   root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyForConfluence);
+  root.querySelector<HTMLButtonElement>("#mcp-preview")?.addEventListener("click", previewNativeDocPlan);
 }
 
 async function copyForConfluence(): Promise<void> {
@@ -224,20 +228,14 @@ async function copyForConfluence(): Promise<void> {
     return;
   }
 
-  if (state.conversionMode === "confluence-pro") {
-    const intent = extractDocumentIntent(html);
-    state.nativeDocPlan = createConfluenceNativeDocPlan(intent);
-    render(i18n("nativeDocPlanReady"), intent.warnings.map((warning) => warning.message));
-    return;
-  }
-
   const payload = convertHtmlToClipboardPayload(html, {
     target: "confluence",
     mode: state.conversionMode,
-    licenseStatus: "free"
+    licenseStatus: state.conversionMode === "confluence-pro" ? "pro" : "free"
   });
 
   try {
+    state.nativeDocPlan = null;
     await writeClipboardPayload(payload);
     render(
       i18n("copied"),
@@ -246,6 +244,19 @@ async function copyForConfluence(): Promise<void> {
   } catch {
     render(i18n("copyFailed"));
   }
+}
+
+async function previewNativeDocPlan(): Promise<void> {
+  const html = await getSourceHtmlForConversion();
+
+  if (!html) {
+    render(state.sourceMode === "file" ? i18n("selectHtmlFile") : i18n("tabReadFailed"));
+    return;
+  }
+
+  const intent = extractDocumentIntent(html);
+  state.nativeDocPlan = createConfluenceNativeDocPlan(intent);
+  render(i18n("nativeDocPlanReady"), intent.warnings.map((warning) => warning.message));
 }
 
 async function getSourceHtmlForConversion(): Promise<string | null> {

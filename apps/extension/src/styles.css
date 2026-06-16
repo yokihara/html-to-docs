@@ -73,7 +73,8 @@ p {
 }
 
 .segmented button,
-.primary {
+.primary,
+.secondary {
   min-height: 36px;
   border: 0;
   border-radius: 6px;
@@ -127,6 +128,13 @@ p {
 .primary {
   background: #172b4d;
   color: #ffffff;
+  font-weight: 700;
+}
+
+.secondary {
+  border: 1px solid #8590a2;
+  background: #ffffff;
+  color: #172b4d;
   font-weight: 700;
 }
 
