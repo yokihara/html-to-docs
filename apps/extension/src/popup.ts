@@ -64,19 +64,20 @@ render();
 function render(status = "", warnings: string[] = []): void {
   root.innerHTML = `
     <section class="shell">
-      <header class="masthead">
-        <div class="brand">
-          <img class="brand-mark" src="/brand-mark.svg" alt="" aria-hidden="true" />
-          <div>
-            <span class="eyebrow">${i18n("freeBadge")}</span>
-            <h1>html-to-docs</h1>
-          </div>
-        </div>
+      <header class="topbar">
+        <img class="brand-mark" src="/brand-mark.svg" alt="" aria-hidden="true" />
         <span class="target-pill">${i18n("targetConfluence")}</span>
       </header>
-      <p class="intro">${i18n("extensionDescription")}</p>
 
-      <section class="panel">
+      <section class="account">
+        <div>
+          <span class="eyebrow">${i18n("freeBadge")}</span>
+          <h1>html-to-docs</h1>
+          <p class="intro">${i18n("extensionDescription")}</p>
+        </div>
+      </section>
+
+      <section class="source-panel">
         <span class="label">${i18n("sourceLabel")}</span>
         <div class="segmented" role="group" aria-label="${i18n("sourceLabel")}">
           <button data-source="tab" class="${state.sourceMode === "tab" ? "active" : ""}">
@@ -92,9 +93,9 @@ function render(status = "", warnings: string[] = []): void {
           <input id="html-file" type="file" accept=".html,text/html" />
           <small>${state.fileName ?? i18n("noFileSelected")}</small>
         </label>
-      </section>
 
-      <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
+        <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
+      </section>
 
       <p id="status" class="status">${status}</p>
       ${warnings.length > 0 ? renderWarnings(warnings) : ""}
