@@ -25,8 +25,8 @@
   color: var(--ink);
   background: var(--canvas-cream);
   font-family:
-    "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+    "Pretendard Variable", "Pretendard-Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
   font-feature-settings: "ss03";
 }
 
@@ -79,11 +79,11 @@ h1 {
   margin: 0;
   color: var(--ink);
   font-family:
-    "Neue Haas Grotesk Display", "Helvetica Now Display", "Helvetica Neue",
-    Arial, sans-serif;
-  font-size: 30px;
-  font-weight: 330;
-  letter-spacing: 0.3px;
+    "Pretendard Variable", "Pretendard-Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+  font-size: 28px;
+  font-weight: 640;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -96,7 +96,7 @@ p {
   margin: 0;
   color: var(--shade-50);
   font-size: 13px;
-  font-weight: 420;
+  font-weight: 430;
   line-height: 1.5;
 }
 
@@ -107,8 +107,8 @@ p {
 .eyebrow,
 .target-pill {
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.72px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
   line-height: 1.2;
   text-transform: uppercase;
 }
@@ -145,7 +145,7 @@ p {
 .label {
   color: var(--ink);
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 680;
   line-height: 1.45;
 }
 
@@ -177,7 +177,7 @@ p {
   background: transparent;
   color: var(--shade-60);
   font-size: 14px;
-  font-weight: 550;
+  font-weight: 650;
 }
 
 .segmented button.active {
@@ -232,7 +232,7 @@ p {
   background: var(--ink);
   color: var(--canvas-light);
   font-size: 16px;
-  font-weight: 550;
+  font-weight: 680;
 }
 
 .secondary {
@@ -242,7 +242,7 @@ p {
   background: var(--canvas-light);
   color: var(--ink);
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 680;
 }
 
 .primary:hover {
@@ -256,7 +256,7 @@ p {
 .status {
   color: var(--success-ink);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 620;
 }
 
 .warnings {

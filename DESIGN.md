@@ -27,16 +27,16 @@ The system borrows the discipline of a two-canvas commerce UI without copying an
 
 ## Typography
 
-Display typography uses a thin grotesk stack:
+Display typography uses the same Korean-first variable sans stack as the UI:
 
 ```css
-"Neue Haas Grotesk Display", "Helvetica Now Display", "Helvetica Neue", Arial, sans-serif
+"Pretendard Variable", "Pretendard-Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif
 ```
 
-Use thin weights around `330` for the wordmark and any display moment. UI body, labels, buttons, and captions use:
+Use medium display weights around `620-680` for the wordmark and compact headings. The previous thin display direction does not fit Korean UI well enough for this product. UI body, labels, buttons, and captions use the same stack:
 
 ```css
-"Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+"Pretendard Variable", "Pretendard-Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif
 ```
 
 Apply `font-feature-settings: "ss03"` globally when the font supports it.
