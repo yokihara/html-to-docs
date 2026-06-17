@@ -6,6 +6,14 @@ html-to-docs is designed for reports created by AI agents, internal tools, dashb
 
 The MVP is a free public release candidate with English and Korean UI. The popup focuses on one primary action: `Copy as document`.
 
+## Preview
+
+![html-to-docs popup preview](docs/assets/screenshots/html-to-docs-01-main.png)
+
+![html-to-docs local file flow](docs/assets/screenshots/html-to-docs-02-local-file.png)
+
+![html-to-docs editable output preview](docs/assets/screenshots/html-to-docs-03-editable-output.png)
+
 ## Features
 
 - Copy the current browser tab as document-friendly HTML.
