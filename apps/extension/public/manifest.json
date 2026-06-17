@@ -24,13 +24,5 @@
     "service_worker": "assets/background.js",
     "type": "module"
   },
-  "permissions": ["activeTab", "clipboardWrite", "scripting"],
-  "host_permissions": ["<all_urls>"],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["assets/content.js"],
-      "run_at": "document_idle"
-    }
-  ]
+  "permissions": ["activeTab", "clipboardWrite", "scripting"]
 }
