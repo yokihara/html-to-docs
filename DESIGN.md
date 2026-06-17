@@ -82,7 +82,7 @@ The operational area. Contains source selector, optional local file input, and t
 
 ### `source-toggle`
 
-Two equally weighted rounded controls. Active state uses blue text and a bottom inset blue rule.
+Two equally weighted rounded controls. Active state uses blue text, a light blue border, and the shared neutral drop shadow; do not use an inset underline.
 
 ### `button-primary`
 
