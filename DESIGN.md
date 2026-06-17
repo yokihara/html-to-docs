@@ -25,6 +25,7 @@ The visual system should feel clean, useful, and slightly technical without look
 - `muted-strong` `#5d6678`: body text.
 - `blue` `#245bff`: active and primary action accent.
 - `blue-deep` `#1646df`: primary hover.
+- `button-shadow` layered neutral shadow: action buttons cast a soft downward shadow; do not tint the shadow with the button color.
 - `success` `#185b4b`: success status text.
 
 ## Typography

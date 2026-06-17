@@ -10,6 +10,10 @@
   --muted-strong: #5d6678;
   --blue: #245bff;
   --blue-deep: #1646df;
+  --button-shadow:
+    0 18px 24px rgba(23, 32, 54, 0.16),
+    0 8px 12px rgba(23, 32, 54, 0.10),
+    0 1px 1px rgba(23, 32, 54, 0.08);
   --success: #185b4b;
   --warning-fill: #fff7dc;
   --warning-border: #edd780;
@@ -210,7 +214,7 @@ p {
   color: #ffffff;
   font-size: 16px;
   font-weight: 760;
-  box-shadow: 0 10px 18px rgba(36, 91, 255, 0.18);
+  box-shadow: var(--button-shadow);
 }
 
 .primary:hover {
@@ -282,6 +286,7 @@ p {
   color: var(--ink);
   font-size: 13px;
   font-weight: 720;
+  box-shadow: var(--button-shadow);
 }
 
 .secondary:hover {
