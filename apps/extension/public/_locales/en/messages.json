@@ -4,24 +4,24 @@
     "description": "Extension name."
   },
   "extensionDescription": {
-    "message": "Copy browser HTML reports into Confluence as editable content.",
+    "message": "Copy browser HTML reports as editable document content.",
     "description": "Chrome Web Store and manifest description."
   },
   "freeBadge": {
     "message": "Browser utility",
     "description": "Small product badge in the popup header."
   },
-  "targetConfluence": {
-    "message": "Confluence",
-    "description": "Current target platform badge."
-  },
-  "copyForConfluence": {
-    "message": "Copy for Confluence",
+  "copyAsDocument": {
+    "message": "Copy as document",
     "description": "Primary popup action."
   },
   "openHtmlFile": {
     "message": "Open HTML file",
     "description": "Local file input label."
+  },
+  "chooseFile": {
+    "message": "Choose file",
+    "description": "Custom local file picker button."
   },
   "currentTab": {
     "message": "Current tab",
@@ -36,7 +36,7 @@
     "description": "Empty local file state."
   },
   "copied": {
-    "message": "Copied. Paste into the Confluence editor.",
+    "message": "Copied. Paste into your document editor.",
     "description": "Successful copy status."
   },
   "copyFailed": {
@@ -72,7 +72,7 @@
     "description": "Paid beta CTA button."
   },
   "betaInterestText": {
-    "message": "I am interested in the html-to-docs Publish Beta: agent-assisted direct publishing to Confluence, Notion, and Obsidian.",
+    "message": "I am interested in the html-to-docs Publish Beta: agent-assisted direct publishing to team document tools.",
     "description": "Text copied when the beta CTA is clicked."
   },
   "betaCopied": {

@@ -9,7 +9,7 @@ The visual system should feel clean, useful, and slightly technical without look
 ## Design Context
 
 - **Target audience:** People who use AI agents, browser-generated reports, and internal documentation tools in daily work.
-- **Use cases:** Copy a current browser tab or local HTML report into Confluence as editable content; discover a future direct-publish pilot.
+- **Use cases:** Copy a current browser tab or local HTML report into document editors as editable content; discover a future direct-publish pilot.
 - **Tone:** Modern extension utility, precise, calm, and operational.
 
 ## Color Tokens
@@ -48,7 +48,7 @@ Use confident weights rather than thin display weights:
 - Outer body has a pale app background and `10px` padding.
 - Main shell is a white rounded panel with a thin border and subtle shadow.
 - Section order:
-  - top toolbar with logo and target chip
+  - top toolbar with logo only
   - account/product summary section
   - source and copy action section
   - status/warnings
@@ -66,7 +66,7 @@ Use confident weights rather than thin display weights:
 
 ### `topbar`
 
-White toolbar with logo on the left and a target chip on the right. It should feel like an extension header, not a marketing masthead.
+White toolbar with the logo on the left. Avoid target-platform badges in the header so the product does not feel locked to a single destination.
 
 ### `brand-mark`
 
@@ -78,7 +78,7 @@ Product summary area with eyebrow, product name, and one compact explanation lin
 
 ### `source-panel`
 
-The operational area. Contains source selector, optional local file input, and the primary copy button.
+The operational area. Contains source selector, custom local file picker, and the primary copy button. Native browser file input controls should be visually hidden behind the product's own compact file button and filename label.
 
 ### `source-toggle`
 
@@ -86,7 +86,7 @@ Two equally weighted rounded controls. Active state uses blue text, a light blue
 
 ### `button-primary`
 
-Filled blue rounded rectangle. Only used for `Copy for Confluence`.
+Filled blue rounded rectangle. Only used for the primary copy action.
 
 ### `pilot-card`
 

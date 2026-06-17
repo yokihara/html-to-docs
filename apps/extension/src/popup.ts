@@ -66,7 +66,6 @@ function render(status = "", warnings: string[] = []): void {
     <section class="shell">
       <header class="topbar">
         <img class="brand-mark" src="/brand-mark.svg" alt="" aria-hidden="true" />
-        <span class="target-pill">${i18n("targetConfluence")}</span>
       </header>
 
       <section class="account">
@@ -90,11 +89,14 @@ function render(status = "", warnings: string[] = []): void {
 
         <label class="file ${state.sourceMode === "file" ? "" : "hidden"}">
           <span>${i18n("openHtmlFile")}</span>
+          <span class="file-control">
+            <span class="file-button">${i18n("chooseFile")}</span>
+            <span class="file-name">${state.fileName ?? i18n("noFileSelected")}</span>
+          </span>
           <input id="html-file" type="file" accept=".html,text/html" />
-          <small>${state.fileName ?? i18n("noFileSelected")}</small>
         </label>
 
-        <button id="copy" class="primary">${i18n("copyForConfluence")}</button>
+        <button id="copy" class="primary">${i18n("copyAsDocument")}</button>
       </section>
 
       <p id="status" class="status">${status}</p>
@@ -146,11 +148,11 @@ function bindEvents(): void {
     render();
   });
 
-  root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyForConfluence);
+  root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyAsDocument);
   root.querySelector<HTMLButtonElement>("#join-beta")?.addEventListener("click", copyPublishBetaInterest);
 }
 
-async function copyForConfluence(): Promise<void> {
+async function copyAsDocument(): Promise<void> {
   const html = await getSourceHtmlForConversion();
 
   if (!html) {

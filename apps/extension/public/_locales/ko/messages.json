@@ -4,24 +4,24 @@
     "description": "Extension name."
   },
   "extensionDescription": {
-    "message": "브라우저 HTML 보고서를 Confluence에 편집 가능한 콘텐츠로 복사합니다.",
+    "message": "브라우저 HTML 보고서를 편집 가능한 문서 콘텐츠로 복사합니다.",
     "description": "Chrome Web Store and manifest description."
   },
   "freeBadge": {
     "message": "브라우저 도구",
     "description": "Small product badge in the popup header."
   },
-  "targetConfluence": {
-    "message": "Confluence",
-    "description": "Current target platform badge."
-  },
-  "copyForConfluence": {
-    "message": "Confluence용 복사",
+  "copyAsDocument": {
+    "message": "문서로 복사",
     "description": "Primary popup action."
   },
   "openHtmlFile": {
     "message": "HTML 파일 열기",
     "description": "Local file input label."
+  },
+  "chooseFile": {
+    "message": "파일 선택",
+    "description": "Custom local file picker button."
   },
   "currentTab": {
     "message": "현재 탭",
@@ -36,7 +36,7 @@
     "description": "Empty local file state."
   },
   "copied": {
-    "message": "복사했습니다. Confluence 편집기에 붙여넣으세요.",
+    "message": "복사했습니다. 문서 편집기에 붙여넣으세요.",
     "description": "Successful copy status."
   },
   "copyFailed": {
@@ -72,7 +72,7 @@
     "description": "Paid beta CTA button."
   },
   "betaInterestText": {
-    "message": "html-to-docs Publish Beta에 관심 있습니다: Confluence, Notion, Obsidian으로 agent 기반 직접 발행.",
+    "message": "html-to-docs Publish Beta에 관심 있습니다: 팀 문서 도구로 agent 기반 직접 발행.",
     "description": "Text copied when the beta CTA is clicked."
   },
   "betaCopied": {

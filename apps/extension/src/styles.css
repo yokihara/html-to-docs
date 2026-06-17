@@ -63,7 +63,7 @@ button {
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: 64px;
   padding: 14px 26px;
   border-bottom: 1px solid var(--border);
@@ -73,20 +73,6 @@ button {
   width: 44px;
   height: 44px;
   flex: 0 0 auto;
-}
-
-.target-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 38px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: var(--surface-blue);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 760;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 .account {
@@ -185,8 +171,9 @@ p {
 
 .file {
   display: grid;
-  gap: 8px;
-  padding: 13px 14px;
+  position: relative;
+  gap: 10px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-control);
   background: var(--surface-soft);
@@ -194,14 +181,50 @@ p {
   font-size: 13px;
 }
 
-.file input {
-  width: 100%;
+.file-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
-.file small {
-  min-height: 16px;
-  color: var(--muted);
-  word-break: break-word;
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 720;
+  box-shadow:
+    0 8px 12px rgba(23, 32, 54, 0.08),
+    0 1px 1px rgba(23, 32, 54, 0.06);
+}
+
+.file-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted-strong);
+  font-size: 13px;
+  font-weight: 520;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file:focus-within {
+  border-color: color-mix(in srgb, var(--blue) 32%, var(--border-strong));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 18%, transparent);
 }
 
 .hidden {
