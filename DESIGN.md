@@ -68,6 +68,10 @@ Use confident weights rather than thin display weights:
 
 White toolbar with logo on the left and a target chip on the right. It should feel like an extension header, not a marketing masthead.
 
+### `brand-mark`
+
+Layered document/code mark used in both the popup header and Chrome extension icons. The mark should remain readable at `16px`, so keep the shapes bold, the outline high-contrast, and the code glyph simple.
+
 ### `account`
 
 Product summary area with eyebrow, product name, and one compact explanation line.
