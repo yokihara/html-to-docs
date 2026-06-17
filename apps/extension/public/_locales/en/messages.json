@@ -4,11 +4,11 @@
     "description": "Extension name."
   },
   "extensionDescription": {
-    "message": "Copy AI-generated HTML reports into Confluence as editable content.",
+    "message": "Copy browser HTML reports into Confluence as editable content.",
     "description": "Chrome Web Store and manifest description."
   },
   "freeBadge": {
-    "message": "Free utility",
+    "message": "Browser utility",
     "description": "Small product badge in the popup header."
   },
   "targetConfluence": {
@@ -60,15 +60,15 @@
     "description": "Source selector label."
   },
   "publishBetaTitle": {
-    "message": "Publish beta",
+    "message": "Publish pilot",
     "description": "Paid beta CTA title."
   },
   "publishBetaDescription": {
-    "message": "Agent-assisted direct publishing is next.",
+    "message": "Direct publishing for teams is being tested.",
     "description": "Paid beta CTA description."
   },
   "joinBeta": {
-    "message": "Join beta",
+    "message": "Join pilot",
     "description": "Paid beta CTA button."
   },
   "betaInterestText": {

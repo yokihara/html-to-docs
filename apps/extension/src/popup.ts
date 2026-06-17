@@ -65,9 +65,12 @@ function render(status = "", warnings: string[] = []): void {
   root.innerHTML = `
     <section class="shell">
       <header class="masthead">
-        <div>
-          <span class="eyebrow">${i18n("freeBadge")}</span>
-          <h1>html-to-docs</h1>
+        <div class="brand">
+          <img class="brand-mark" src="/brand-mark.svg" alt="" aria-hidden="true" />
+          <div>
+            <span class="eyebrow">${i18n("freeBadge")}</span>
+            <h1>html-to-docs</h1>
+          </div>
         </div>
         <span class="target-pill">${i18n("targetConfluence")}</span>
       </header>

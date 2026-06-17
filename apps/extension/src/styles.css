@@ -1,8 +1,8 @@
 :root {
-  color: #1d2433;
-  background: #ffffff;
+  color: #26231e;
+  background: #eef1ec;
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 }
 
@@ -11,9 +11,9 @@
 }
 
 body {
-  width: 392px;
+  width: 386px;
   margin: 0;
-  background: #f5f7fb;
+  background: #eef1ec;
 }
 
 button,
@@ -23,22 +23,37 @@ input {
 
 .shell {
   display: grid;
-  gap: 14px;
-  padding: 18px;
+  gap: 15px;
+  padding: 18px 18px 16px;
 }
 
 .masthead {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
 }
 
 h1 {
   margin: 0;
-  color: #111827;
-  font-size: 21px;
-  font-weight: 760;
+  color: #26231e;
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1.1;
 }
 
@@ -49,61 +64,60 @@ h2 {
 
 p {
   margin: 0;
-  color: #566174;
+  color: #5f5a50;
   font-size: 13px;
   line-height: 1.45;
 }
 
 .intro {
-  max-width: 310px;
+  max-width: 322px;
 }
 
 .eyebrow,
 .target-pill {
-  color: #5c6f8c;
+  color: #71695d;
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
 .eyebrow {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .target-pill {
   flex: 0 0 auto;
-  padding: 5px 8px;
-  border: 1px solid #c6d4e4;
-  border-radius: 999px;
-  background: #eef6ff;
-  color: #0f5eb8;
+  padding: 5px 7px 4px;
+  border: 1px solid #bcc9bf;
+  border-radius: 6px;
+  background: #e2e8e2;
+  color: #315a50;
 }
 
 .panel {
   display: grid;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid #dde5ef;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #cbd5ce;
   border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  background: #fbfaf6;
 }
 
 .label {
-  color: #344054;
+  color: #3d3932;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 700;
 }
 
 .segmented {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  padding: 3px;
-  border: 1px solid #d8e1ee;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #cbd5ce;
   border-radius: 8px;
-  background: #f1f5f9;
+  background: #e4e9e3;
 }
 
 .segmented button,
@@ -122,22 +136,22 @@ p {
 
 .segmented button {
   background: transparent;
-  color: #536276;
+  color: #5f5a50;
   font-size: 13px;
   font-weight: 650;
 }
 
 .segmented button.active {
-  background: #ffffff;
-  color: #13233a;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12);
-  font-weight: 760;
+  background: #fbfaf6;
+  color: #26231e;
+  box-shadow: inset 0 0 0 1px #c9bdae;
+  font-weight: 750;
 }
 
 .segmented button:focus-visible,
 .primary:focus-visible,
 .secondary:focus-visible {
-  outline: 2px solid #2684ff;
+  outline: 2px solid #8f3f2b;
   outline-offset: 2px;
 }
 
@@ -146,10 +160,10 @@ p {
   gap: 8px;
   margin-top: 2px;
   padding: 11px;
-  border: 1px dashed #9fb0c4;
+  border: 1px dashed #b9ad9d;
   border-radius: 8px;
-  background: #fbfdff;
-  color: #26374d;
+  background: #eef1ec;
+  color: #3d3932;
   font-size: 13px;
 }
 
@@ -159,7 +173,7 @@ p {
 
 .file small {
   min-height: 16px;
-  color: #68768a;
+  color: #71695d;
   word-break: break-word;
 }
 
@@ -171,37 +185,41 @@ p {
   min-height: 17px;
 }
 
+.status:empty {
+  display: none;
+}
+
 .primary {
-  background: #172b4d;
-  color: #ffffff;
-  box-shadow: 0 8px 18px rgba(23, 43, 77, 0.18);
-  font-weight: 760;
+  background: #315a50;
+  color: #fbfaf6;
+  box-shadow: none;
+  font-weight: 750;
 }
 
 .secondary {
-  border: 1px solid #c6d4e4;
-  background: #ffffff;
-  color: #1d2b43;
+  border: 1px solid #c9bdae;
+  background: #fbfaf6;
+  color: #315a50;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 750;
 }
 
 .primary:hover,
 .secondary:hover {
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .primary:hover {
-  background: #0f1f3a;
+  background: #284b43;
 }
 
 .secondary:hover {
-  border-color: #97a9bf;
-  background: #f8fafc;
+  border-color: #9c8f7d;
+  background: #eef1ec;
 }
 
 .status {
-  color: #16704a;
+  color: #315a50;
   font-size: 12px;
   font-weight: 650;
 }
@@ -210,9 +228,9 @@ p {
   display: grid;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #f1c84c;
+  border: 1px solid #dec36a;
   border-radius: 8px;
-  background: #fff7d6;
+  background: #fbf1cc;
 }
 
 .warnings ul {
@@ -223,7 +241,7 @@ p {
 }
 
 .warnings li {
-  color: #533f04;
+  color: #5b4612;
   font-size: 12px;
   line-height: 1.4;
 }
@@ -234,9 +252,9 @@ p {
   justify-content: space-between;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #d5e2f0;
+  border: 1px solid #cbd5ce;
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  background: #e2e8e2;
 }
 
 .beta div {

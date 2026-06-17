@@ -4,11 +4,11 @@
     "description": "Extension name."
   },
   "extensionDescription": {
-    "message": "AI가 만든 HTML 보고서를 Confluence에 편집 가능한 콘텐츠로 복사합니다.",
+    "message": "브라우저 HTML 보고서를 Confluence에 편집 가능한 콘텐츠로 복사합니다.",
     "description": "Chrome Web Store and manifest description."
   },
   "freeBadge": {
-    "message": "무료 도구",
+    "message": "브라우저 도구",
     "description": "Small product badge in the popup header."
   },
   "targetConfluence": {
@@ -60,15 +60,15 @@
     "description": "Source selector label."
   },
   "publishBetaTitle": {
-    "message": "Publish 베타",
+    "message": "Publish 파일럿",
     "description": "Paid beta CTA title."
   },
   "publishBetaDescription": {
-    "message": "Agent 기반 직접 발행 기능을 준비 중입니다.",
+    "message": "팀용 직접 발행 흐름을 검증 중입니다.",
     "description": "Paid beta CTA description."
   },
   "joinBeta": {
-    "message": "베타 참여",
+    "message": "파일럿 참여",
     "description": "Paid beta CTA button."
   },
   "betaInterestText": {
