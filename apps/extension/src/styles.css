@@ -316,3 +316,11 @@ p {
   border-color: var(--blue);
   color: var(--blue);
 }
+
+.secondary:disabled {
+  cursor: not-allowed;
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--surface-soft) 78%, var(--surface));
+  color: var(--muted);
+  box-shadow: none;
+}

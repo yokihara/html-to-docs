@@ -64,19 +64,11 @@
     "description": "Paid beta CTA title."
   },
   "publishBetaDescription": {
-    "message": "Direct publishing for teams is being tested.",
+    "message": "Direct publishing for teams is being prepared.",
     "description": "Paid beta CTA description."
   },
   "joinBeta": {
-    "message": "Join pilot",
+    "message": "Coming soon",
     "description": "Paid beta CTA button."
-  },
-  "betaInterestText": {
-    "message": "I am interested in the html-to-docs Publish Beta: agent-assisted direct publishing to team document tools.",
-    "description": "Text copied when the beta CTA is clicked."
-  },
-  "betaCopied": {
-    "message": "Beta note copied.",
-    "description": "Status after copying beta interest text."
   }
 }

@@ -91,6 +91,7 @@ Filled blue rounded rectangle. Only used for the primary copy action.
 ### `pilot-card`
 
 Soft card at the bottom. It should be visibly secondary and should never compete with the copy action.
+If no real signup, waitlist, or publish flow exists, the pilot action must be disabled and labeled as a preparation state rather than copying placeholder text.
 
 ## Do
 

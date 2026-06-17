@@ -107,7 +107,7 @@ function render(status = "", warnings: string[] = []): void {
           <span class="label">${i18n("publishBetaTitle")}</span>
           <p>${i18n("publishBetaDescription")}</p>
         </div>
-        <button id="join-beta" class="secondary">${i18n("joinBeta")}</button>
+        <button id="join-beta" class="secondary" disabled>${i18n("joinBeta")}</button>
       </section>
     </section>
   `;
@@ -149,7 +149,6 @@ function bindEvents(): void {
   });
 
   root.querySelector<HTMLButtonElement>("#copy")?.addEventListener("click", copyAsDocument);
-  root.querySelector<HTMLButtonElement>("#join-beta")?.addEventListener("click", copyPublishBetaInterest);
 }
 
 async function copyAsDocument(): Promise<void> {
@@ -172,15 +171,6 @@ async function copyAsDocument(): Promise<void> {
       i18n("copied"),
       payload.warnings.map((warning) => warning.message)
     );
-  } catch {
-    render(i18n("copyFailed"));
-  }
-}
-
-async function copyPublishBetaInterest(): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(i18n("betaInterestText"));
-    render(i18n("betaCopied"));
   } catch {
     render(i18n("copyFailed"));
   }

@@ -64,19 +64,11 @@
     "description": "Paid beta CTA title."
   },
   "publishBetaDescription": {
-    "message": "팀용 직접 발행 흐름을 검증 중입니다.",
+    "message": "팀용 직접 발행 흐름을 준비 중입니다.",
     "description": "Paid beta CTA description."
   },
   "joinBeta": {
-    "message": "파일럿 참여",
+    "message": "준비 중",
     "description": "Paid beta CTA button."
-  },
-  "betaInterestText": {
-    "message": "html-to-docs Publish Beta에 관심 있습니다: 팀 문서 도구로 agent 기반 직접 발행.",
-    "description": "Text copied when the beta CTA is clicked."
-  },
-  "betaCopied": {
-    "message": "베타 참여 문구를 복사했습니다.",
-    "description": "Status after copying beta interest text."
   }
 }
